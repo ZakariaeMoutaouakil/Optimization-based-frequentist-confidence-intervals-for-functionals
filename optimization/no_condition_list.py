@@ -1,7 +1,7 @@
 from time import time
 from typing import List
 
-from optimization.no_condition.no_condition import maximize_product
+from optimization.maximize_product import maximize_product
 
 
 def maximize_product_list(x: List[List[float]], threshold: float) -> list[float]:
