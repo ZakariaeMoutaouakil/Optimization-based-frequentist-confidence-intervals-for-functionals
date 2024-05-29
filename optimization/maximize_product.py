@@ -21,6 +21,8 @@ def maximize_product(x: List[float], threshold: float, fixed_p2: float = None) -
     Returns:
     - Tuple[float, List[float]]: The optimal value and the list of optimal p values.
     """
+    print(x)
+    print(fixed_p2)
     n = len(x)
 
     # Define the variables
@@ -46,13 +48,14 @@ def maximize_product(x: List[float], threshold: float, fixed_p2: float = None) -
     # Solve the problem
     problem.solve(solver=cp.SCS)  # You can use other solvers like ECOS, MOSEK, etc.
 
+    print(p.value.tolist())
     # Return the optimal value and the optimal p values
     return problem.value, p.value.tolist()
 
 
 if __name__ == "__main__":
     # Example usage with fixed p_2
-    x_ = [2, 4, 1]
+    x_ = [0, 4, 1]
     threshold_ = 0.9
     p2_fixed = 0.05
 

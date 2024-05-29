@@ -6,7 +6,7 @@ from typing import List
 def calculate_multinomial_probability_grid(
         multinomial_coefficients: List[int],
         probability_vectors: List[List[float]],
-        x_values: List[List[float]]
+        x_values: List[List[int]]
 ) -> List[List[float]]:
     """
     Calculate a 2D array where each list corresponds to a probability vector and contains
@@ -24,7 +24,7 @@ def calculate_multinomial_probability_grid(
     for prob_vector in probability_vectors:
         row_results = []
         for c, x in zip(multinomial_coefficients, x_values):
-            term = c * prod(p ** xi for p, xi in zip(prob_vector, x))
+            term = c * prod(pi ** xi for pi, xi in zip(prob_vector, x))
             row_results.append(term)
         results.append(row_results)
     return results

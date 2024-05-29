@@ -3,7 +3,7 @@ from time import time
 from typing import List
 
 
-def discrete_simplex(k: int, n: int) -> List[List[float]]:
+def discrete_simplex(k: int, n: int, normalize: bool = True) -> List[List[float]] | List[List[int]]:
     """
     Generate the discrete simplex for k coordinates and common denominator n.
 
@@ -24,9 +24,12 @@ def discrete_simplex(k: int, n: int) -> List[List[float]]:
         point = [0] + list(comb) + [n]
         diffs = [point[i + 1] - point[i] for i in range(len(point) - 1)]
 
-        # Normalize the point to make the sum equal to 1
-        normalized_point = [x / n for x in diffs]
-        simplex.append(normalized_point)
+        if normalize:
+            # Normalize the point to make the sum equal to 1
+            normalized_point = [x / n for x in diffs]
+            simplex.append(normalized_point)
+        else:
+            simplex.append(diffs)
 
     return simplex
 
