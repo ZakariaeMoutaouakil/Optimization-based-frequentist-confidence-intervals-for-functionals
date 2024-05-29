@@ -4,12 +4,12 @@ from typing import List, Tuple
 import cvxpy as cp
 
 
-def maximize_product(x: List[float], threshold: float) -> Tuple[float, List[float]]:
+def maximize_product_under_condition(x: List[float], fixed_p2: float) -> Tuple[float, List[float]]:
     """
     Solves the geometric programming problem to maximize the product p_1^x_1 * p_2^x_2 * ... * p_n^x_n
     subject to the constraints:
     - p_1 >= p_2 >= ... >= p_n
-    - p_2, p_3, ..., p_n < threshold
+    - p_2, p_3, ..., p_n < fixed_p2
     - p is a probability vector (sum(p) = 1)
 
     Args:
@@ -26,9 +26,10 @@ def maximize_product(x: List[float], threshold: float) -> Tuple[float, List[floa
 
     # Define the constraints
     constraints = [
-        p[1:] <= threshold,  # p_2, p_3, ..., p_n are less than the threshold
+        p[0] >= fixed_p2,  # p_1 is greater than the threshold
+        p[1] <= fixed_p2,  # p_2 is less than the threshold
         p[:-1] >= p[1:],  # p_1 >= p_2 >= ... >= p_n
-        cp.sum(p) <= 1  # p is a probability vector
+        cp.sum(p) <= 1 - fixed_p2  # p is a probability vector
     ]
 
     # Define the objective function: maximize the product of p_i^x_i
@@ -47,14 +48,14 @@ def maximize_product(x: List[float], threshold: float) -> Tuple[float, List[floa
 
 if __name__ == "__main__":
     # Example usage
-    x_ = [2, 1.5, 1.2, 1, 0.5, 0.1]
-    threshold_ = 0.8
+    x_ = [2, 4, 1]
+    p2 = 0.3
 
     start_time = time()
-    optimal_value, optimal_p = maximize_product(x_, threshold_)
+    optimal_value, optimal_p = maximize_product_under_condition(x_, p2)
     end_time = time()
 
     print("Optimal value:", optimal_value)
     print("Optimal p values:", optimal_p)
-    print("Sum of p values:", sum(optimal_p))
-    print("Time taken:", end_time - start_time)
+    print("Sum of p values:", sum(optimal_p) + p2)
+    print(f"Time taken: {end_time - start_time:.6f} seconds")
