@@ -24,7 +24,9 @@ def calculate_multinomial_probability_grid(
     for prob_vector in probability_vectors:
         row_results = []
         for c, x in zip(multinomial_coefficients, x_values):
+            # print("c:", c, "x:", x)
             term = c * prod(pi ** xi for pi, xi in zip(prob_vector, x))
+            # print("term:", term)
             row_results.append(term)
         results.append(row_results)
     return results
