@@ -30,19 +30,12 @@ def final_filter(vectors: List[List[float]],
                  x: List[float],
                  multinomial_coefficients: List[int],
                  index_of_sample: int,
-                 probabilities: List[List[float]],
                  threshold: float) -> float:
     maximum_likelihood = -2 * maximize_product(x=x, threshold=threshold)[0]
     final_candidates = []
     for i in range(len(vectors)):
-        # if 0 in vectors[i]:
-        #     continue
-        probability = -2 * log(multinomial_coefficients[index_of_sample]) -2 * sum(
+        likelihood = -2 * log(multinomial_coefficients[index_of_sample]) - 2 * sum(
             [xi * log(pi) for pi, xi in zip(vectors[i], x) if pi != 0])
-        print("probability:", probability)
-        if not probability:
-            continue
-        likelihood = probability
         print("likelihood:", likelihood)
         if likelihood <= quantiles[i] + maximum_likelihood:
             final_candidates.append(vectors[i])
