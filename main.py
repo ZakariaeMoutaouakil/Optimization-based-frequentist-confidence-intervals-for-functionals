@@ -23,7 +23,7 @@ def seconds_to_minutes(seconds: float) -> Tuple[int, float]:
     return minutes, leftover_seconds
 
 
-n = 20
+n = 100
 m = 3
 
 start_time = time()
@@ -50,7 +50,6 @@ print("length of likelihood:", len(likelihood))
 
 factorials = factorial_list(n)
 multinomial_coefficients = multinomial_coefficient(vectors=sample_space, factorials=factorials)
-print("multinomial coefficients:", max(multinomial_coefficients))
 probabilities = calculate_multinomial_probability_grid(multinomial_coefficients, constraint_set, sample_space)
 print("probabilities:", probabilities)
 print("length of probabilities:", len(probabilities))
@@ -85,7 +84,7 @@ else:
     print(f"Time taken: {time_taken:.6f} seconds")
 
 # Create the file path
-file_path = 'results.txt'
+file_path = 'results.tsv'
 # Check if the file exists
 if not os.path.exists(file_path):
     # Create the file

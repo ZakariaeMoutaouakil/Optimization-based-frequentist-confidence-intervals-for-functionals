@@ -1,11 +1,25 @@
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from time import time
 from typing import List
 
 from optimization.maximize_product import maximize_product
 
 
-def maximize_product_list(x: List[List[float]], threshold: float) -> list[float]:
-    return [2 * maximize_product(x_i, threshold)[0] for x_i in x]
+def maximize_product_list(x: List[List[float]], threshold: float) -> List[float]:
+    results = []
+
+    with ThreadPoolExecutor() as executor:
+        future_to_x = {executor.submit(maximize_product, x_i, threshold): x_i for x_i in x}
+
+        for future in as_completed(future_to_x):
+            x_i = future_to_x[future]
+            try:
+                result = future.result()
+                results.append(2 * result[0])
+            except Exception as exc:
+                print(f'An error occurred for input {x_i}: {exc}')
+
+    return results
 
 
 if __name__ == "__main__":

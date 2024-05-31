@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from time import time
 from typing import List
 
@@ -5,17 +6,27 @@ from optimization.maximize_product import maximize_product
 
 
 def maximize_product_grid(xs: List[List[float]], threshold: float, fixed_p2s: List[float]) -> List[List[float]]:
-    """
-    Takes a list of x and a list of p_2 values and returns a 2D array of results
-    from the maximize_product function.
+    results = []
 
-    :param xs: A list of lists of fixed exponents x_i.
-    :param threshold: Predefined threshold for p_i.
-    :param threshold: Predefined threshold for p_1.
-    :param fixed_p2s: A list of fixed values for p_2.
-    :return: A 2D array of results.
-    """
-    return [[-2. * maximize_product(x, threshold, fixed_p2)[0] for x in xs] for fixed_p2 in fixed_p2s]
+    def task(x, fixed_p2):
+        return -2. * maximize_product(x, threshold, fixed_p2)[0]
+
+    with ThreadPoolExecutor() as executor:
+        future_to_params = {(executor.submit(task, x, fixed_p2)): (x, fixed_p2) for fixed_p2 in fixed_p2s for x in xs}
+
+        grid = {fixed_p2: [] for fixed_p2 in fixed_p2s}
+        for future in as_completed(future_to_params):
+            x, fixed_p2 = future_to_params[future]
+            try:
+                result = future.result()
+                grid[fixed_p2].append(result)
+            except Exception as exc:
+                print(f'An error occurred for input (x={x}, fixed_p2={fixed_p2}): {exc}')
+
+        # Convert the grid dictionary to a list of lists
+        results = [grid[fixed_p2] for fixed_p2 in fixed_p2s]
+
+    return results
 
 
 if __name__ == "__main__":
