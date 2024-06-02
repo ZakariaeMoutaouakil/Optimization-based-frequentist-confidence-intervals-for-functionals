@@ -23,7 +23,7 @@ def seconds_to_minutes(seconds: float) -> Tuple[int, float]:
     return minutes, leftover_seconds
 
 
-n = 35
+n = 20
 m = 3
 
 start_time = time()
@@ -50,6 +50,7 @@ print("length of likelihood:", len(likelihood))
 
 factorials = factorial_list(n)
 multinomial_coefficients = multinomial_coefficient(vectors=sample_space, factorials=factorials)
+print("multinomial coefficients:", max(multinomial_coefficients))
 probabilities = calculate_multinomial_probability_grid(multinomial_coefficients, constraint_set, sample_space)
 print("probabilities:", probabilities)
 print("length of probabilities:", len(probabilities))

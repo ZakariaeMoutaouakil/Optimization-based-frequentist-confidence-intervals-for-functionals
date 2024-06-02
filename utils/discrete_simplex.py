@@ -37,10 +37,10 @@ def discrete_simplex(k: int, n: int, normalize: bool = True) -> List[List[float]
 if __name__ == "__main__":
     # Example usage:
     k_ = 5
-    n_ = 40
+    n_ = 7
 
     start_time = time()
-    example_simplex = discrete_simplex(k_, n_)
+    example_simplex = discrete_simplex(k_, n_, normalize=False)
     end_time = time()
 
     for p in example_simplex:
