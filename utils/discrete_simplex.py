@@ -1,6 +1,29 @@
-from itertools import combinations_with_replacement
+import sys
 from time import time
 from typing import List
+
+
+def get_total_size(obj, seen=None):
+    """Recursively finds the total memory size of an object."""
+    if seen is None:
+        seen = set()
+
+    obj_id = id(obj)
+    if obj_id in seen:
+        return 0
+
+    seen.add(obj_id)
+    size = sys.getsizeof(obj)
+
+    if isinstance(obj, dict):
+        size += sum([get_total_size(v, seen) for v in obj.values()])
+        size += sum([get_total_size(k, seen) for k in obj.keys()])
+    elif hasattr(obj, '__dict__'):
+        size += get_total_size(obj.__dict__, seen)
+    elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes, bytearray)):
+        size += sum([get_total_size(i, seen) for i in obj])
+
+    return size / (1024 ** 2)
 
 
 def discrete_simplex(k: int, n: int, normalize: bool = True) -> List[List[float]] | List[List[int]]:
@@ -14,30 +37,31 @@ def discrete_simplex(k: int, n: int, normalize: bool = True) -> List[List[float]
     Returns:
     List[List[float]]: A list of lists representing the discrete simplex points.
     """
-    # Generate all combinations of k integers that sum to n
-    combs = combinations_with_replacement(range(n + 1), k - 1)
+
+    def generate_combinations(dim, num):
+        if dim == 1:
+            yield [num]
+        else:
+            for i in range(num + 1):
+                for sub_comb in generate_combinations(dim - 1, num - i):
+                    yield [i] + sub_comb
 
     simplex = []
 
-    for comb in combs:
-        # Compute the differences between successive elements and append 0 at the start and n at the end
-        point = [0] + list(comb) + [n]
-        diffs = [point[i + 1] - point[i] for i in range(len(point) - 1)]
-
+    for comb in generate_combinations(k, n):
         if normalize:
-            # Normalize the point to make the sum equal to 1
-            normalized_point = [x / n for x in diffs]
+            normalized_point = [x / n for x in comb]
             simplex.append(normalized_point)
         else:
-            simplex.append(diffs)
+            simplex.append(comb)
 
     return simplex
 
 
 if __name__ == "__main__":
     # Example usage:
-    k_ = 5
-    n_ = 7
+    k_ = 3
+    n_ = 5
 
     start_time = time()
     example_simplex = discrete_simplex(k_, n_, normalize=False)
@@ -45,5 +69,6 @@ if __name__ == "__main__":
 
     for p in example_simplex:
         print(p)
+    print(f"Total size: {get_total_size(example_simplex):.6f} MB")
 
     print(f"Time taken: {end_time - start_time:.6f} seconds")

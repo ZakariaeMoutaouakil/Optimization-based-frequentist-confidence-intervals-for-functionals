@@ -4,7 +4,7 @@ from typing import List, Tuple
 import cvxpy as cp
 
 
-def maximize_product(x: List[float], threshold: float, fixed_p2: float = None) -> Tuple[float, List[float]]:
+def maximize_product(x: List[int], threshold: float = None, fixed_p2: float = None) -> Tuple[float, List[float]]:
     """
     Solves the geometric programming problem to maximize the product p_1^x_1 * p_2^x_2 * ... * p_n^x_n
     subject to the constraints:
@@ -21,8 +21,6 @@ def maximize_product(x: List[float], threshold: float, fixed_p2: float = None) -
     Returns:
     - Tuple[float, List[float]]: The optimal value and the list of optimal p values.
     """
-    print(x)
-    print(fixed_p2)
     n = len(x)
 
     # Define the variables
@@ -30,10 +28,12 @@ def maximize_product(x: List[float], threshold: float, fixed_p2: float = None) -
 
     # Define the constraints
     constraints = [
-        p[0] >= threshold,  # p_1 is greater than the threshold
-        p[:-1] >= p[1:],  # p_1 >= p_2 >= ... >= p_n
         cp.sum(p) <= 1  # p is a probability vector
     ]
+
+    if threshold is not None:
+        constraints.append(p[0] >= threshold)  # p_1 is greater than the threshold
+        constraints.append(p[:-1] >= p[1:])  # p_1 >= p_2 >= ... >= p_n
 
     if fixed_p2 is not None:
         constraints.append(p[1] == fixed_p2)  # p_2 is fixed in advance
@@ -48,7 +48,6 @@ def maximize_product(x: List[float], threshold: float, fixed_p2: float = None) -
     # Solve the problem
     problem.solve(solver=cp.SCS)  # You can use other solvers like ECOS, MOSEK, etc.
 
-    print(p.value.tolist())
     # Return the optimal value and the optimal p values
     return problem.value, p.value.tolist()
 
@@ -66,10 +65,10 @@ if __name__ == "__main__":
     print("Optimal value with fixed p_2:", optimal_value)
     print("Optimal p values with fixed p_2:", optimal_p)
     print("Sum of p values with fixed p_2:", sum(optimal_p))
-    print(f"Time taken with fixed p_2: {end_time - start_time:.6f} seconds")
+    print(f"Time taken with fixed p_2: {end_time - start_time:.6f} seconds\n")
 
     # Example usage without fixed p_2
-    x_ = [2, 1.5, 1.2, 1, 0.5, 0.1]
+    x_ = [2, 5, 2, 1, 5, 1]
     threshold_ = 0.8
 
     start_time = time()

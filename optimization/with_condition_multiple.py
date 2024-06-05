@@ -4,7 +4,7 @@ from typing import List
 from optimization.maximize_product import maximize_product
 
 
-def maximize_product_grid(xs: List[List[float]], threshold: float, fixed_p2s: List[float]) -> List[List[float]]:
+def maximize_product_grid(xs: List[List[int]], threshold: float, fixed_p2s: List[float]) -> List[List[float]]:
     """
     Takes a list of x and a list of p_2 values and returns a 2D array of results
     from the maximize_product function.
@@ -21,8 +21,8 @@ def maximize_product_grid(xs: List[List[float]], threshold: float, fixed_p2s: Li
 if __name__ == "__main__":
     # Example usage
     x_values = [
-        [2, 1.5, 1.2, 1, 0.5],
-        [1, 2, 1.5, 1.3, 0.7]
+        [2, 5, 2, 1, 5],
+        [1, 2, 5, 3, 7]
     ]
     p2_values = [0.1, 0.09]
     threshold_ = 0.8

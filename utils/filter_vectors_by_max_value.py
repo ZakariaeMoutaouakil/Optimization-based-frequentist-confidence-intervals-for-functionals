@@ -1,3 +1,4 @@
+from time import time
 from typing import List
 
 
@@ -25,5 +26,8 @@ if __name__ == "__main__":
     ]
     thresh = 0.5
 
+    start_time = time()
     filtered_vectors = filter_vectors_by_max_value(vecs, thresh)
+    end_time = time()
     print("Filtered vectors:", filtered_vectors)
+    print(f"Time taken: {end_time - start_time:.6f} seconds")

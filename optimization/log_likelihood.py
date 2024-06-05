@@ -5,7 +5,7 @@ from optimization.no_condition_list import maximize_product_list
 from optimization.with_condition_multiple import maximize_product_grid
 
 
-def log_likelihood_grid(xs: List[List[float]], threshold: float, fixed_p2s: List[float]) -> List[List[float]]:
+def log_likelihood_grid(xs: List[List[int]], threshold: float, fixed_p2s: List[float]) -> List[List[float]]:
     """
     Calculates the log likelihood for a given set of input data.
 
@@ -23,7 +23,7 @@ def log_likelihood_grid(xs: List[List[float]], threshold: float, fixed_p2s: List
     4. Return the list of combined values.
     """
     results = []
-    maximize_product_xs = maximize_product_list(xs, threshold)
+    maximize_product_xs = maximize_product_list(xs)
     maximize_product_fixed_p2 = maximize_product_grid(xs, threshold, fixed_p2s)
     for fixed_p2_list in maximize_product_fixed_p2:
         results.append([x + y for x, y in zip(maximize_product_xs, fixed_p2_list)])
@@ -33,8 +33,8 @@ def log_likelihood_grid(xs: List[List[float]], threshold: float, fixed_p2s: List
 if __name__ == "__main__":
     # Example usage
     x_values = [
-        [2, 1.5, 1.2, 1, 0.5],
-        [1, 2, 1.5, 1.3, 0.7]
+        [2, 5, 2, 1, 5],
+        [1, 2, 5, 3, 7]
     ]
     fixed_p2_values = [0.1, 0.05, 0.01]
     thresh = 0.8
