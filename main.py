@@ -26,35 +26,35 @@ def seconds_to_minutes(seconds: float) -> Tuple[int, float]:
     return minutes, leftover_seconds
 
 
-n = 20
-m = 3
+n = 10
+m = 7
 
 start_time = time()
 
 threshold = 0.9
-precision = 101
+precision = 41
 bin_width = 0.001
 
 # Calculate the constraint set
 simplex: List[List[float]] = discrete_simplex(k=m, n=precision, normalize=True)
-print("simplex:", simplex)
+# print("simplex:", simplex)
 filtered_simplex = filter_vectors_by_max_value(simplex, threshold=threshold)
-print("filtered_simplex:", filtered_simplex)
+# print("filtered_simplex:", filtered_simplex)
 constraint_set = unique_vectors(filtered_simplex)
-print("constraint_set:", constraint_set)
+# print("constraint_set:", constraint_set)
 
 # Calculate the fixed p_2 values
 fixed_p2s = bin_second_largest_values(constraint_set, bin_width=bin_width)
-print("fixed_p2s:", fixed_p2s)
+# print("fixed_p2s:", fixed_p2s)
 
 # Calculate the likelihood
 ordered_x = sample_space(k=m, n=n)
-print("ordered_x:", ordered_x)
+# print("ordered_x:", ordered_x)
 likelihood = log_likelihood_grid(ordered_x, threshold, fixed_p2s)
-print("likelihood:", likelihood)
-print("length of likelihood:", len(likelihood))
+# print("likelihood:", likelihood)
+# print("length of likelihood:", len(likelihood))
 full_x: List[List[int]] = discrete_simplex(k=m, n=n, normalize=False)
-print("full_x:", full_x)
+# print("full_x:", full_x)
 x_indices = unique_vector_indices(full_x, ordered_x)
 full_likelihood = enlarge_matrix(likelihood, x_indices)
 assert len(likelihood) == len(fixed_p2s)

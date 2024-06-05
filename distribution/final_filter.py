@@ -33,6 +33,7 @@ def final_filter(vectors: List[List[float]],
                  x: List[int],
                  threshold: float) -> float:
     maximum_likelihood = -2 * maximize_product(x=x, threshold=threshold)[0]
+    print("maximum_likelihood:", maximum_likelihood)
     final_candidates = []
     for i in tqdm(range(len(vectors)), desc="Filtering vectors"):
         likelihood = -2 * sum([xi * log(pi) for pi, xi in zip(vectors[i], x) if pi != 0])
