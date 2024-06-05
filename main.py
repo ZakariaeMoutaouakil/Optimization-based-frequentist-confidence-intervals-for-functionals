@@ -7,7 +7,7 @@ from distribution.find_closest_indices import find_closest_indices
 from distribution.quantile import quantile_1_minus_alpha
 from distribution.second_largest_value import bin_second_largest_values
 from optimization.log_likelihood import log_likelihood_grid
-from utils.discrete_simplex import discrete_simplex
+from utils.sample_space import sample_space
 from utils.factorial import factorial_list
 from utils.filter_vectors_by_max_value import filter_vectors_by_max_value
 from utils.multinomial_coefficients import multinomial_coefficient
@@ -27,13 +27,13 @@ n = 20
 m = 3
 
 start_time = time()
-sample_space: List[List[int]] = discrete_simplex(k=m, n=n, normalize=False)
+sample_space: List[List[int]] = sample_space(k=m, n=n, normalize=False)
 
 threshold = 0.9
 precision = 103
 bin_width = 0.001
 
-simplex: List[List[float]] = discrete_simplex(k=m, n=precision, normalize=True)
+simplex: List[List[float]] = sample_space(k=m, n=precision, normalize=True)
 print("simplex:", simplex)
 filtered_simplex = filter_vectors_by_max_value(simplex, threshold=threshold)
 print("filtered_simplex:", filtered_simplex)

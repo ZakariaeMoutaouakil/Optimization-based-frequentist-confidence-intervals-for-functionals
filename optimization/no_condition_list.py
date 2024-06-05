@@ -1,11 +1,11 @@
 from time import time
 from typing import List
 
-from optimization.maximize_product import maximize_product
+from optimization.maximize_product import solve_geometric_problem
 
 
-def maximize_product_list(x: List[List[float]], threshold: float) -> list[float]:
-    return [2 * maximize_product(x_i, threshold)[0] for x_i in x]
+def maximize_product_list(x: List[List[int]], threshold: float) -> list[float]:
+    return [2 * solve_geometric_problem(x_i, threshold)[0] for x_i in x]
 
 
 if __name__ == "__main__":

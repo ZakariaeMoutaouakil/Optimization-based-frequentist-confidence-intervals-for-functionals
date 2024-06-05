@@ -1,82 +1,109 @@
+import itertools
 from time import time
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Callable, Any, Union, Optional
 
-import cvxpy as cp
+import numpy as np
+from scipy.optimize import minimize
 
 
-def maximize_product(x: List[float], threshold: float, fixed_p2: float = None) -> Tuple[float, List[float]]:
-    """
-    Solves the geometric programming problem to maximize the product p_1^x_1 * p_2^x_2 * ... * p_n^x_n
-    subject to the constraints:
-    - p_1 >= p_2 >= ... >= p_n
-    - p_2, p_3, ..., p_n < threshold
-    - p is a probability vector (sum(p) = 1 if fixed_p2 is None, else sum(p) <= 1 - threshold)
-    - p_2 can be fixed if specified
+def permutation_sum_product(p: np.ndarray, x: List[int]) -> float:
+    m = len(p)
+    s_m = list(itertools.permutations(range(m)))
+    total_sum = 0
+    for sigma in s_m:
+        product = 1
+        for i in range(m):
+            product *= p[i] ** x[sigma[i]]
+        total_sum += product
+    return total_sum
 
-    Args:
-    - x (List[float]): List of fixed exponents x_i.
-    - threshold (float): Predefined threshold for p_i.
-    - fixed_p2 (float, optional): Fixed value for p_2, if any. Default is None.
 
-    Returns:
-    - Tuple[float, List[float]]: The optimal value and the list of optimal p values.
-    """
-    print(x)
-    print(fixed_p2)
-    n = len(x)
+def objective(p: np.ndarray, x: List[int]) -> float:
+    return -permutation_sum_product(p, x)
 
-    # Define the variables
-    p = cp.Variable(n, pos=True)
 
-    # Define the constraints
-    constraints = [
-        p[0] >= threshold,  # p_1 is greater than the threshold
-        p[:-1] >= p[1:],  # p_1 >= p_2 >= ... >= p_n
-        cp.sum(p) <= 1  # p is a probability vector
-    ]
+def constraint_sum(p: np.ndarray) -> float:
+    return 1 - float(np.sum(p))
 
-    if fixed_p2 is not None:
-        constraints.append(p[1] == fixed_p2)  # p_2 is fixed in advance
 
-    # Define the objective function: maximize the product of p_i^x_i
-    # which is equivalent to maximizing the sum of x_i * log(p_i) (since log is monotonic)
-    objective = cp.Maximize(cp.sum(cp.multiply(x, cp.log(p))))
+def constraint_order(i: int) -> Callable[[np.ndarray], float]:
+    def inner(p: np.ndarray) -> float:
+        return float(p[i] - p[i + 1] - 1e-8)
+    return inner
 
-    # Define the problem
-    problem = cp.Problem(objective, constraints)
 
-    # Solve the problem
-    problem.solve(solver=cp.SCS)  # You can use other solvers like ECOS, MOSEK, etc.
+def constraint_second_largest(p: np.ndarray, value: float) -> float:
+    sorted_p = np.sort(p)[::-1]  # Sort in descending order
+    return float(sorted_p[1] - value)
 
-    print(p.value.tolist())
-    # Return the optimal value and the optimal p values
-    return problem.value, p.value.tolist()
+
+def constraint_maximum(p: np.ndarray, threshold: float) -> float:
+    return float(np.max(p) - threshold)
+
+
+def solve_geometric_problem(x: List[int], second_largest_value: Optional[float] = None, threshold: Optional[float] = None) -> Tuple[List[float], float]:
+    m = len(x)
+    p0 = np.random.rand(m)
+    p0 = p0 / np.sum(p0) * 0.99  # Initial guess close to the boundary condition
+
+    cons: Union[Dict[str, Any], List[Dict[str, Any]], None] = [{'type': 'ineq', 'fun': constraint_sum}]
+    cons.extend([{'type': 'ineq', 'fun': constraint_order(i)} for i in range(m - 1)])
+
+    if second_largest_value is not None:
+        cons.append({'type': 'eq', 'fun': lambda p: constraint_second_largest(p, second_largest_value)})
+
+    if threshold is not None:
+        cons.append({'type': 'ineq', 'fun': lambda p: constraint_maximum(p, threshold)})
+
+    bounds: List[Tuple[float, float]] = [(0.0, 1.0) for _ in range(m)]
+    result = minimize(objective, p0, args=(x,), bounds=bounds, constraints=cons)
+    return result.x.tolist(), -result.fun
 
 
 if __name__ == "__main__":
-    # Example usage with fixed p_2
-    x_ = [0, 4, 1]
-    threshold_ = 0.9
-    p2_fixed = 0.05
-
+    # Example usage without second_largest_value and threshold
+    x_ = [3, 1, 2]  # Example values for x
     start_time = time()
-    optimal_value, optimal_p = maximize_product(x_, threshold_, p2_fixed)
+    optimal_p, max_value = solve_geometric_problem(x_)
     end_time = time()
+    print("Example without second_largest_value and threshold:")
+    print("Optimal p:", optimal_p)
+    print(f"Max value: {max_value:.6f}")
+    print(f"Sum of optimal p: {sum(optimal_p):.6f}")
+    print(f"Time taken: {end_time - start_time:.6f} seconds\n")
 
-    print("Optimal value with fixed p_2:", optimal_value)
-    print("Optimal p values with fixed p_2:", optimal_p)
-    print("Sum of p values with fixed p_2:", sum(optimal_p))
-    print(f"Time taken with fixed p_2: {end_time - start_time:.6f} seconds")
-
-    # Example usage without fixed p_2
-    x_ = [2, 1.5, 1.2, 1, 0.5, 0.1]
-    threshold_ = 0.8
-
+    # Example usage with second_largest_value
+    second_largest_value_ = 0.1  # Example predefined value for the second-largest coordinate
     start_time = time()
-    optimal_value, optimal_p = maximize_product(x_, threshold_)
+    optimal_p, max_value = solve_geometric_problem(x_, second_largest_value_)
     end_time = time()
+    print("Example with second_largest_value:")
+    print("Optimal p:", optimal_p)
+    print(f"Max value: {max_value:.6f}")
+    print(f"Sum of optimal p: {sum(optimal_p):.6f}")
+    print(f"Second largest value in optimal p: {sorted(optimal_p, reverse=True)[1]:.6f}")
+    print(f"Time taken: {end_time - start_time:.6f} seconds\n")
 
-    print("Optimal value without fixed p_2:", optimal_value)
-    print("Optimal p values without fixed p_2:", optimal_p)
-    print("Sum of p values without fixed p_2:", sum(optimal_p))
-    print(f"Time taken without fixed p_2: {end_time - start_time:.6f} seconds")
+    # Example usage with threshold
+    threshold_ = 0.8  # Example threshold value
+    start_time = time()
+    optimal_p, max_value = solve_geometric_problem(x_, threshold=threshold_)
+    end_time = time()
+    print("Example with threshold:")
+    print("Optimal p:", optimal_p)
+    print(f"Max value: {max_value:.6f}")
+    print(f"Sum of optimal p: {sum(optimal_p):.6f}")
+    print(f"Maximum value in optimal p: {max(optimal_p):.6f}")
+    print(f"Time taken: {end_time - start_time:.6f} seconds\n")
+
+    # Example usage with both second_largest_value and threshold
+    start_time = time()
+    optimal_p, max_value = solve_geometric_problem(x_, second_largest_value_, threshold_)
+    end_time = time()
+    print("Example with both second_largest_value and threshold:")
+    print("Optimal p:", optimal_p)
+    print(f"Max value: {max_value:.6f}")
+    print(f"Sum of optimal p: {sum(optimal_p):.6f}")
+    print(f"Second largest value in optimal p: {sorted(optimal_p, reverse=True)[1]:.6f}")
+    print(f"Maximum value in optimal p: {max(optimal_p):.6f}")
+    print(f"Time taken: {end_time - start_time:.6f} seconds")
