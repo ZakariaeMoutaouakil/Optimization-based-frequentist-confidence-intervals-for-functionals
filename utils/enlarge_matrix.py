@@ -1,22 +1,23 @@
 from time import time
 from typing import List
 
-from utils.unique_vector_indices import unique_vector_indices
+from tqdm import tqdm
+
 from utils.unique_vector_indices import get_unique_vectors
+from utils.unique_vector_indices import unique_vector_indices
 
 
 def enlarge_matrix(unique_matrix: List[List[float]], mapping: List[int]) -> List[List[float]]:
-    print("Mapping:", mapping)
-    print("len(mapping):", len(mapping))
-    print("Unique Matrix:", unique_matrix)
-    print("len(unique_matrix):", len(unique_matrix))
     if not unique_matrix or not mapping:
         return []
 
     num_rows = len(unique_matrix)
     num_cols = len(mapping)
 
-    enlarged_matrix = [[unique_matrix[i][mapping[j]] for j in range(num_cols)] for i in range(num_rows)]
+    enlarged_matrix = [
+        [unique_matrix[i][mapping[j]] for j in range(num_cols)]
+        for i in tqdm(range(num_rows), desc="Enlarging matrix")
+    ]
     return enlarged_matrix
 
 

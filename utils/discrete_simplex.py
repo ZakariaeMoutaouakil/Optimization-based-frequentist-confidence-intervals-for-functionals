@@ -1,6 +1,8 @@
 import sys
 from time import time
-from typing import List
+from typing import List, Union
+
+from tqdm import tqdm
 
 
 def get_total_size(obj, seen=None):
@@ -26,7 +28,7 @@ def get_total_size(obj, seen=None):
     return size / (1024 ** 2)
 
 
-def discrete_simplex(k: int, n: int, normalize: bool = True) -> List[List[float]] | List[List[int]]:
+def discrete_simplex(k: int, n: int, normalize: bool = True) -> Union[List[List[float]], List[List[int]]]:
     """
     Generate the discrete simplex for k coordinates and common denominator n.
 
@@ -48,7 +50,7 @@ def discrete_simplex(k: int, n: int, normalize: bool = True) -> List[List[float]
 
     simplex = []
 
-    for comb in generate_combinations(k, n):
+    for comb in tqdm(generate_combinations(k, n), desc="Generating simplex"):
         if normalize:
             normalized_point = [x / n for x in comb]
             simplex.append(normalized_point)

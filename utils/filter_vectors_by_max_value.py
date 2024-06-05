@@ -1,6 +1,8 @@
 from time import time
 from typing import List
 
+from tqdm import tqdm
+
 
 def filter_vectors_by_max_value(vectors: List[List[float]], threshold: float) -> List[List[float]]:
     """
@@ -13,7 +15,7 @@ def filter_vectors_by_max_value(vectors: List[List[float]], threshold: float) ->
     Returns:
     - List[List[float]]: A filtered list of vectors.
     """
-    return [vector for vector in vectors if max(vector) > threshold]
+    return [vector for vector in tqdm(vectors, desc="Filtering vectors") if max(vector) > threshold]
 
 
 if __name__ == "__main__":

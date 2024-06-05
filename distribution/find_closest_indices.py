@@ -1,6 +1,8 @@
 from time import time
 from typing import List
 
+from tqdm import tqdm
+
 
 def find_closest_indices(vectors: List[List[float]], second_values: List[float]) -> List[int]:
     def second_largest(numbers: List[float]) -> float:
@@ -23,7 +25,7 @@ def find_closest_indices(vectors: List[List[float]], second_values: List[float])
         return closest_idx
 
     result: List[int] = []
-    for vector in vectors:
+    for vector in tqdm(vectors, desc="Finding closest indices"):
         sec_largest = second_largest(vector)
         index = closest_index(sec_largest, second_values)
         result.append(index)

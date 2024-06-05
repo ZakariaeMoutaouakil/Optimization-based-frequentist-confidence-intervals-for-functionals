@@ -1,5 +1,7 @@
 from typing import List
 
+from tqdm import tqdm
+
 
 def unique_vectors(vectors: List[List[float]]) -> List[List[float]]:
     """
@@ -15,7 +17,7 @@ def unique_vectors(vectors: List[List[float]]) -> List[List[float]]:
     seen = set()
     unique_list = []
 
-    for vector in vectors:
+    for vector in tqdm(vectors, desc="Filtering unique vectors"):
         vector_set = frozenset(vector)  # Convert the vector to a frozenset
         if vector_set not in seen:
             seen.add(vector_set)

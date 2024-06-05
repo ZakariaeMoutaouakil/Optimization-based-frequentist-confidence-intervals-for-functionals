@@ -2,6 +2,8 @@ from math import prod
 from time import time
 from typing import List
 
+from tqdm import tqdm
+
 
 def calculate_multinomial_probability_grid(
         multinomial_coefficients: List[int],
@@ -15,18 +17,16 @@ def calculate_multinomial_probability_grid(
     Args:
     - multinomial_coefficients (List[int]): A list of multinomial coefficients.
     - probability_vectors (List[List[float]]): A list of probability vectors.
-    - x_values (List[List[float]]): A list of x values.
+    - x_values (List[List[int]]): A list of x values.
 
     Returns:
     - List[List[float]]: A 2D array of results.
     """
     results = []
-    for prob_vector in probability_vectors:
+    for prob_vector in tqdm(probability_vectors, desc="Calculating probabilities"):
         row_results = []
         for c, x in zip(multinomial_coefficients, x_values):
-            # print("c:", c, "x:", x)
             term = c * prod(pi ** xi for pi, xi in zip(prob_vector, x))
-            # print("term:", term)
             row_results.append(term)
         results.append(row_results)
     return results

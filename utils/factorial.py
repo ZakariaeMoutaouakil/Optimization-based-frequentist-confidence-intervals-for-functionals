@@ -1,6 +1,8 @@
 from time import time
 from typing import List
 
+from tqdm import tqdm
+
 
 def factorial_list(n: int) -> List[int]:
     """
@@ -13,7 +15,7 @@ def factorial_list(n: int) -> List[int]:
     List[int]: A list of factorials from 0! to n!.
     """
     factorials = [1] * (n + 1)  # Initialize factorials list with 1s
-    for i in range(2, n + 1):
+    for i in tqdm(range(2, n + 1), desc="Calculating factorials"):
         factorials[i] = factorials[i - 1] * i
     return factorials
 

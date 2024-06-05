@@ -1,6 +1,8 @@
 from time import time
 from typing import List
 
+from tqdm import tqdm
+
 from optimization.maximize_product import maximize_product
 
 
@@ -15,7 +17,8 @@ def maximize_product_grid(xs: List[List[int]], threshold: float, fixed_p2s: List
     :param fixed_p2s: A list of fixed values for p_2.
     :return: A 2D array of results.
     """
-    return [[-2. * maximize_product(x, threshold, fixed_p2)[0] for x in xs] for fixed_p2 in fixed_p2s]
+    return [[-2. * maximize_product(x, threshold, fixed_p2)[0] for x in xs] for fixed_p2 in
+            tqdm(fixed_p2s, desc="Processing fixed_p2s")]
 
 
 if __name__ == "__main__":

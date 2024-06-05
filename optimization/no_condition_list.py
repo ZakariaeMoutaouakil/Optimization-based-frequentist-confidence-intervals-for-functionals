@@ -1,11 +1,13 @@
 from time import time
 from typing import List
 
+from tqdm import tqdm
+
 from optimization.maximize_product import maximize_product
 
 
-def maximize_product_list(x: List[List[int]]) -> list[float]:
-    return [2 * maximize_product(x_i)[0] for x_i in x]
+def maximize_product_list(x: List[List[int]]) -> List[float]:
+    return [2 * maximize_product(x_i)[0] for x_i in tqdm(x, desc="Maximizing products without threshold")]
 
 
 if __name__ == "__main__":

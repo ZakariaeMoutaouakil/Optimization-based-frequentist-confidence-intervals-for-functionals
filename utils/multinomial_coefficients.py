@@ -2,6 +2,8 @@ from math import factorial
 from time import time
 from typing import List
 
+from tqdm import tqdm
+
 
 def multinomial_coefficient(vectors: List[List[int]], factorials: List[int]) -> List[int]:
     """
@@ -23,7 +25,7 @@ def multinomial_coefficient(vectors: List[List[int]], factorials: List[int]) -> 
             denominator *= factorials[k]
         return numerator // denominator
 
-    return [multinomial(vector) for vector in vectors]
+    return [multinomial(vector) for vector in tqdm(vectors, desc="Calculating multinomial coefficients")]
 
 
 if __name__ == "__main__":

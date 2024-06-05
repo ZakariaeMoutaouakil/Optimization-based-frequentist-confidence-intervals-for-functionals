@@ -1,6 +1,8 @@
 from time import time
 from typing import List
 
+from tqdm import tqdm
+
 from optimization.no_condition_list import maximize_product_list
 from optimization.with_condition_multiple import maximize_product_grid
 
@@ -25,7 +27,7 @@ def log_likelihood_grid(xs: List[List[int]], threshold: float, fixed_p2s: List[f
     results = []
     maximize_product_xs = maximize_product_list(xs)
     maximize_product_fixed_p2 = maximize_product_grid(xs, threshold, fixed_p2s)
-    for fixed_p2_list in maximize_product_fixed_p2:
+    for fixed_p2_list in tqdm(maximize_product_fixed_p2, desc="Calculating log likelihood"):
         results.append([x + y for x, y in zip(maximize_product_xs, fixed_p2_list)])
     return results
 

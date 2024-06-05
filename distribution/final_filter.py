@@ -2,6 +2,8 @@ from math import log
 from time import time
 from typing import List
 
+from tqdm import tqdm
+
 from optimization.maximize_product import maximize_product
 
 
@@ -32,7 +34,7 @@ def final_filter(vectors: List[List[float]],
                  threshold: float) -> float:
     maximum_likelihood = -2 * maximize_product(x=x, threshold=threshold)[0]
     final_candidates = []
-    for i in range(len(vectors)):
+    for i in tqdm(range(len(vectors)), desc="Filtering vectors"):
         likelihood = -2 * sum([xi * log(pi) for pi, xi in zip(vectors[i], x) if pi != 0])
         print("likelihood:", likelihood)
         if likelihood <= quantiles[i] + maximum_likelihood:

@@ -1,6 +1,8 @@
 import time
 from typing import List
 
+from tqdm import tqdm
+
 
 def get_unique_vectors(vectors: List[List[int]]) -> List[List[int]]:
     seen = set()
@@ -14,7 +16,7 @@ def get_unique_vectors(vectors: List[List[int]]) -> List[List[int]]:
 
 
 def unique_vector_indices(raw_vectors: List[List[int]], unique_vectors: List[List[int]]) -> List[int]:
-    unique_map = {frozenset(vec): i for i, vec in enumerate(unique_vectors)}
+    unique_map = {frozenset(vec): i for i, vec in tqdm(enumerate(unique_vectors), desc="Building unique map")}
     return [unique_map[frozenset(vec)] for vec in raw_vectors]
 
 
