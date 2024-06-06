@@ -1,3 +1,4 @@
+from time import time
 from typing import List
 
 from lower_bound.generate_list import generate_list
@@ -20,17 +21,21 @@ def reject_hypothesis(x: List[int], q: float, alpha: float) -> bool:
     n = sum(x)
     p = generate_list(m=m, q=q)
     quantile = multinomial_max_cdf_inverse(prob=alpha, n=n, p=p)
+    # print(f"Quantile: {quantile}")
     return max(x) < quantile
 
 
 if __name__ == "__main__":
     # Example usage
-    observed_counts = [3, 2, 4, 1, 0]  # observed frequencies
+    observed_counts = [8, 2, 0, 0, 0]  # observed frequencies
     max_freq = max(observed_counts) / sum(observed_counts)
     print("Maximum observed frequency:", max_freq)
-    q_ = 0.399  # expected probability for the first category
-    alpha_ = 0.05  # significance level
+    q_ = 0.5  # expected probability for the first category
+    alpha_ = 0.99  # significance level
 
+    start_time = time()  # Start time
     result = reject_hypothesis(observed_counts, q_, alpha_)
+    end_time = time()  # End time
     print(f"Null hypothesis: {max_freq} > {q_}")
     print(f"Reject the null hypothesis: {result}")
+    print(f"Time taken: {end_time - start_time:.6f} seconds")

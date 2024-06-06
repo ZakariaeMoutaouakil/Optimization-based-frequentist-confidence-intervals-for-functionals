@@ -26,7 +26,7 @@ def multinomial_max_cdf(x: int, n: int, p: List[float]) -> float:
 
     # Iterate over all possible combinations of counts such that the maximum count is <= k_max
     for comb in np.ndindex(*(x + 1 for _ in range(len(p)))):
-        if np.sum(comb) <= n and max(comb) <= x:
+        if np.sum(comb) == n and max(comb) <= x:
             cdf += multinomial.pmf(comb, n, p)
 
     return cdf
@@ -34,11 +34,11 @@ def multinomial_max_cdf(x: int, n: int, p: List[float]) -> float:
 
 if __name__ == "__main__":
     # Example usage
-    k_max = 1  # maximum count to consider
-    n_ = 3  # number of trials
+    k_max = 2  # maximum count to consider
+    n_ = 6  # number of trials
     proba = [0.2, 0.5, 0.3]  # probabilities of the different outcomes
 
     max_cdf_value = multinomial_max_cdf(k_max, n_, proba)
     x_ = [k_max] * len(proba)
-    assert max_cdf_value == multinomial_cdf(x_, n_, proba)
+    assert max_cdf_value == multinomial_cdf(x_, proba), "CDF values do not match"
     print(f"CDF value of the maximum count: {max_cdf_value}")
