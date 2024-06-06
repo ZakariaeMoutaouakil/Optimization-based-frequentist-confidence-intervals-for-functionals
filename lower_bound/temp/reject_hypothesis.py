@@ -30,8 +30,8 @@ if __name__ == "__main__":
     observed_counts = [8, 2, 0, 0, 0]  # observed frequencies
     max_freq = max(observed_counts) / sum(observed_counts)
     print("Maximum observed frequency:", max_freq)
-    q_ = 0.5  # expected probability for the first category
-    alpha_ = 0.99  # significance level
+    q_ = 0.8  # expected probability for the first category
+    alpha_ = 0.2  # significance level
 
     start_time = time()  # Start time
     result = reject_hypothesis(observed_counts, q_, alpha_)

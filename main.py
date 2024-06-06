@@ -27,13 +27,13 @@ def seconds_to_minutes(seconds: float) -> Tuple[int, float]:
 
 
 n = 10
-m = 7
+m = 5
 
 start_time = time()
 
-threshold = 0.9
-precision = 41
-bin_width = 0.001
+threshold = 0.8
+precision = 101
+bin_width = 0.0001
 
 # Calculate the constraint set
 simplex: List[List[float]] = discrete_simplex(k=m, n=precision, normalize=True)
@@ -45,7 +45,7 @@ constraint_set = unique_vectors(filtered_simplex)
 
 # Calculate the fixed p_2 values
 fixed_p2s = bin_second_largest_values(constraint_set, bin_width=bin_width)
-# print("fixed_p2s:", fixed_p2s)
+print("fixed_p2s:", fixed_p2s)
 
 # Calculate the likelihood
 ordered_x = sample_space(k=m, n=n)

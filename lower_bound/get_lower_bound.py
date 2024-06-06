@@ -1,23 +1,45 @@
-from time import time
-from typing import List, Callable
+import matplotlib.pyplot as plt
+from numpy import linspace
 
-from lower_bound.find_threshold import find_threshold
-from lower_bound.reject_hypothesis import reject_hypothesis
+from lower_bound.generate_list import generate_list
+from lower_bound.multinomial_max_cdf_inverse import multinomial_max_cdf_inverse
 
 
-def get_lower_bound(x: List[int], alpha: float) -> float:
-    reject: Callable[[float], bool] = lambda q: reject_hypothesis(x=x, q=q, alpha=alpha)
-    return find_threshold(boolean_function=reject, end=max(x) / sum(x))
+def get_lower_bound(alpha: float, q: float, n: int, m: int) -> float:
+    """
+    Calculate the lower bound of the maximum observed frequency.
+
+    Parameters:
+    alpha (float): The significance level.
+    q (float): The expected probability for the first category.
+    n (int): The total number of trials.
+
+    Returns:
+    float: The lower bound of the maximum observed frequency.
+    """
+    p = generate_list(m=m, q=q)
+    quantile = multinomial_max_cdf_inverse(prob=alpha, n=n, p=p)
+    return quantile
 
 
 if __name__ == "__main__":
-    # Example usage
-    observed_counts = [8, 2, 0, 0, 0]  # observed frequencies
-    for alpha_ in [0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99]: # significance level
-        start_time = time()  # Start time
-        bound = get_lower_bound(observed_counts, alpha_)
-        end_time = time()  # End time
-        print("Significance level:", alpha_)
-        print("Maximum observed frequency:", max(observed_counts) / sum(observed_counts))
-        print(f"Lower bound: {bound}")
-        print(f"Time taken: {end_time - start_time:.6f} seconds")
+    # Example usage:
+    alpha_ = 0.05  # significance level
+    q_ = 0.2  # expected probability for the first category
+    n_ = 10  # total number of trials
+    m_ = 5  # number of elements in the list
+
+    lower_bound = get_lower_bound(alpha_, q_, n_, m_)
+    print(f"Lower Bound: {lower_bound}")
+
+    # Plotting the lower bound for different values of q
+    q_values = linspace(0.01, 0.99, 100)
+    lower_bounds = [get_lower_bound(alpha_, q, n_, m_) for q in q_values]
+
+    plt.plot(q_values, lower_bounds, label=f'n={n_}')
+    plt.xlabel('Expected Probability (q)')
+    plt.ylabel('Lower Bound of Max Observed Frequency')
+    plt.title('Lower Bound of Maximum Observed Frequency vs. Expected Probability')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
