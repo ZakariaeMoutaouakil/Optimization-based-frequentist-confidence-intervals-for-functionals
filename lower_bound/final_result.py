@@ -24,9 +24,9 @@ def final_result(alpha: float, x: List[int]) -> float:
 
 if __name__ == "__main__":
     # Example usage
-    x_ = [10, 5, 1, 2]
+    x_ = [9, 6, 2]
     print("Maximum observed frequency:", max(x_) / sum(x_))
     start_time = time()  # Start time
-    print("Final Result:", final_result(alpha=0.0001, x=x_))
+    print("Final Result:", final_result(alpha=0.1, x=x_))
     end_time = time()  # End time
     print(f"Time taken: {end_time - start_time:.6f} seconds")
