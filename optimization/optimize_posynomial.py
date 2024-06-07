@@ -5,7 +5,10 @@ from typing import List, Tuple
 from cvxpy import Variable, Minimize, sum, Problem, power
 
 
-def optimize_posynomial(x: List[int], margin: float = None, debug: bool = False) -> Tuple[float, List[float]]:
+def optimize_posynomial(x: List[int],
+                        margin: float = None,
+                        nondecreasing: bool = True,
+                        debug: bool = False) -> Tuple[float, List[float]]:
     m = len(x)
     p = Variable(m, pos=True)
 
@@ -14,10 +17,10 @@ def optimize_posynomial(x: List[int], margin: float = None, debug: bool = False)
     posynomial = sum(posynomial_terms)
 
     constraints = [
-                      (p[i] ** (-1)) * p[i + 1] <= 1 for i in range(m - 1)
-                  ] + [
-                      sum(p) <= 1
-                  ]
+        sum(p) <= 1
+    ]
+    if nondecreasing:
+        constraints += [(p[i] ** (-1)) * p[i + 1] <= 1 for i in range(m - 1)]
 
     if margin is not None:
         constraints.append(p[0] * (p[1] ** (-1)) == margin)

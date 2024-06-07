@@ -1,3 +1,4 @@
+import math
 import sys
 from time import time
 from typing import List, Union
@@ -48,9 +49,12 @@ def discrete_simplex(k: int, n: int, normalize: bool = True) -> Union[List[List[
                 for sub_comb in generate_combinations(dim - 1, num - i):
                     yield [i] + sub_comb
 
+    # Calculate the number of combinations
+    num_combinations = math.comb(n + k - 1, k - 1)
+
     simplex = []
 
-    for comb in tqdm(generate_combinations(k, n), desc="Generating simplex"):
+    for comb in tqdm(generate_combinations(k, n), total=num_combinations, desc="Generating simplex"):
         if normalize:
             normalized_point = [x / n for x in comb]
             simplex.append(normalized_point)
