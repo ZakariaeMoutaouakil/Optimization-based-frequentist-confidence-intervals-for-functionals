@@ -78,4 +78,15 @@ if __name__ == "__main__":
     print("Optimal value without fixed p_2:", optimal_value)
     print("Optimal p values without fixed p_2:", optimal_p)
     print("Sum of p values without fixed p_2:", sum(optimal_p))
-    print(f"Time taken without fixed p_2: {end_time - start_time:.6f} seconds")
+    print(f"Time taken without fixed p_2: {end_time - start_time:.6f} seconds\n")
+
+    # Example usage without threshold
+    x_ = [1, 1, 1, 1, 1, 1]
+    start_time = time()
+    optimal_value, optimal_p_values = maximize_product(x_)
+    end_time = time()
+
+    print("Optimal value:", optimal_value)
+    print("Optimal p values:", optimal_p_values)
+    print("Sum of p values:", sum(optimal_p_values))
+    print(f"Time taken: {end_time - start_time:.6f} seconds")
