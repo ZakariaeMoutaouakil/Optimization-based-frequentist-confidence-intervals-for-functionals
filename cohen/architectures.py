@@ -1,14 +1,15 @@
 import torch
-from torchvision.models.resnet import resnet50
 import torch.backends.cudnn as cudnn
+from torchvision.models.resnet import resnet50
+
 from archs.cifar_resnet import resnet as resnet_cifar
 from datasets import get_normalize_layer
-from torch.nn.functional import interpolate
 
 # resnet50 - the classic ResNet-50, sized for ImageNet
 # cifar_resnet20 - a 20-layer residual network sized for CIFAR
 # cifar_resnet110 - a 110-layer residual network sized for CIFAR
 ARCHITECTURES = ["resnet50", "cifar_resnet20", "cifar_resnet110"]
+
 
 def get_architecture(arch: str, dataset: str) -> torch.nn.Module:
     """ Return a neural network (with random weights)

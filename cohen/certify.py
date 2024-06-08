@@ -10,10 +10,10 @@ from core import Smooth
 from datasets import get_dataset, DATASETS, get_num_classes
 
 parser = argparse.ArgumentParser(description='Certify many examples')
-parser.add_argument("dataset", choices=DATASETS, help="which dataset")
-parser.add_argument("base_classifier", type=str, help="path to saved pytorch model of base classifier")
-parser.add_argument("sigma", type=float, help="noise hyperparameter")
-parser.add_argument("outfile", type=str, help="output file")
+parser.add_argument("--dataset", choices=DATASETS, help="which dataset")
+parser.add_argument("--base_classifier", type=str, help="path to saved pytorch model of base classifier")
+parser.add_argument("--sigma", type=float, help="noise hyperparameter")
+parser.add_argument("--outfile", type=str, help="output file")
 parser.add_argument("--batch", type=int, default=1000, help="batch size")
 parser.add_argument("--skip", type=int, default=1, help="how many examples to skip")
 parser.add_argument("--max", type=int, default=-1, help="stop after this many examples")
@@ -25,7 +25,7 @@ args = parser.parse_args()
 
 if __name__ == "__main__":
     # load the base classifier
-    checkpoint = torch.load(args.base_classifier)
+    checkpoint = torch.load(args.base_classifier, map_location=torch.device('cuda'))
     base_classifier = get_architecture(checkpoint["arch"], args.dataset)
     base_classifier.load_state_dict(checkpoint['state_dict'])
 
