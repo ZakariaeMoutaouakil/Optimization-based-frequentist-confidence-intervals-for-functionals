@@ -16,10 +16,11 @@ def final_filter(vectors: List[List[float]],
     final_candidates = []
     for i in tqdm(range(len(vectors)), desc="Filtering vectors"):
         likelihood = -2 * sum([xi * log(pi) for pi, xi in zip(vectors[i], x) if pi != 0])
-        print("likelihood:", likelihood)
-        print("quantiles[i]:", quantiles[i])
-        if likelihood <= quantiles[i] + maximum_likelihood:
-            print("Adding vector", vectors[i])
+        if likelihood <= quantiles[i] + maximum_likelihood:# or  True:
+            print("likelihood   :", likelihood)
+            print("quantiles[i] :", quantiles[i])
+            print("Adding vector:", vectors[i])
+            print("Margin       :", vector_margins([vectors[i]])[0])
             final_candidates.append(vectors[i])
     margins = vector_margins(final_candidates)
     return min(margins)

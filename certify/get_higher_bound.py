@@ -1,5 +1,6 @@
 from time import time
 from typing import List
+from statsmodels.stats.proportion import proportion_confint
 
 from distribution.final_filter import final_filter
 from distribution.find_closest_indices import find_closest_indices
@@ -80,10 +81,17 @@ def get_higher_bound(observation: List[int],
 
 if __name__ == "__main__":
     # Example usage
-    x_ = [19, 1, 2]
+    x_ = [16, 0, 2]
+    alpha = 0.01
+    sorted_x = sorted(x_, reverse=True)
+    n = sum(x_)
+    p1_=proportion_confint(sorted_x[0], n, alpha=2 * alpha, method="beta")[0]
     start_time = time()  # Start time
-    print("Final Result:", get_higher_bound(observation=x_, alpha=0.1))
-    print("Actual p2:", sorted(x_, reverse=True)[1] / sum(x_))
+    p2 = get_higher_bound(observation=x_, alpha=alpha)
+    print("Final Result:", p2)
+    print("Actual p2:", sorted(x_, reverse=True)[1] / n)
+    print("Clopper Pearson p2:", 1-p1_)
+    assert (1 - p1_)>p2, "My estimate should be better than the Clopper Pearson estimate"
     end_time = time()  # End time
     time_taken = end_time - start_time
     if time_taken > 60:
