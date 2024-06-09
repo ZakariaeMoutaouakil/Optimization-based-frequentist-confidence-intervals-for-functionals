@@ -1,19 +1,14 @@
 from time import time
-from typing import List
+from typing import List, Callable
 
 from tqdm import tqdm
 
+from distribution.sort_callable_values import margin_of_vector, second_largest
 
-def find_closest_indices(vectors: List[List[float]], second_values: List[float]) -> List[int]:
-    def second_largest(numbers: List[float]) -> float:
-        first, second = float('-inf'), float('-inf')
-        for number in numbers:
-            if number > first:
-                first, second = number, first
-            elif first > number > second:
-                second = number
-        return second
 
+def find_closest_indices(vectors: List[List[float]],
+                         values: List[float],
+                         func: Callable[[List[float]], float]) -> List[int]:
     def closest_index(target: float, floats: List[float]) -> int:
         closest_idx = 0
         min_diff = abs(floats[0] - target)
@@ -26,19 +21,44 @@ def find_closest_indices(vectors: List[List[float]], second_values: List[float])
 
     result: List[int] = []
     for vector in tqdm(vectors, desc="Finding closest indices"):
-        sec_largest = second_largest(vector)
-        index = closest_index(sec_largest, second_values)
+        computed_value = func(vector)
+        index = closest_index(computed_value, values)
         result.append(index)
 
     return result
 
 
 if __name__ == "__main__":
-    # Example usage
-    vecs: List[List[float]] = [[4, 2, 5], [1, 3, 2], [8, 7, 6]]
-    vals: List[float] = [2.5, 4.1, 6.0, 7.5]
+    # Example usage for margin_of_vector:
+    vecs_margin: List[List[float]] = [
+        [4, 2, 5],  # Margin = 5 / 4 = 1.25
+        [1, 3, 2],  # Margin = 3 / 2 = 1.5
+        [8, 7, 6],  # Margin = 8 / 7 ≈ 1.14
+        [1, 2, 4],  # Margin = 4 / 2 = 2.0
+        [1, 2.5, 1]  # Margin = 2.5 / 1 = 2.5
+    ]
+    vals_margin: List[float] = [1.5, 2.0, 1.1, 2.5]
 
     start_time = time()
-    print(find_closest_indices(vecs, vals))
+    print("Using margin_of_vector:")
+    closest_indices_margin = find_closest_indices(vecs_margin, vals_margin, margin_of_vector)
+    print(closest_indices_margin)  # Expected output: indices of the closest margins
+    end_time = time()
+    print(f"Time taken: {end_time - start_time:.6f} seconds")
+
+    # Example usage for second_largest:
+    vecs_second_largest: List[List[float]] = [
+        [4, 2, 5],  # Second largest = 4
+        [1, 3, 2],  # Second largest = 2
+        [8, 7, 6],  # Second largest = 7
+        [1, 2, 4],  # Second largest = 2
+        [1, 2.5, 1]  # Second largest = 1
+    ]
+    vals_second_largest: List[float] = [2.5, 4.1, 6.0, 7.5]
+
+    start_time = time()
+    print("Using second_largest:")
+    closest_indices_second_largest = find_closest_indices(vecs_second_largest, vals_second_largest, second_largest)
+    print(closest_indices_second_largest)  # Expected output: indices of the closest second-largest values
     end_time = time()
     print(f"Time taken: {end_time - start_time:.6f} seconds")

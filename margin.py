@@ -6,7 +6,7 @@ from tqdm import tqdm
 from distribution.filter_close_elements import filter_close_elements
 from distribution.final_filter_margin import final_filter
 from distribution.find_closest_indices_margin import find_closest_indices
-from distribution.quantile import quantile_1_minus_alpha
+from distribution.quantile_1_minus_alpha import quantile_1_minus_alpha
 from distribution.vector_margins import vector_margins
 from optimization.log_likelihood_margin import log_likelihood_grid
 from utils.discrete_simplex import discrete_simplex

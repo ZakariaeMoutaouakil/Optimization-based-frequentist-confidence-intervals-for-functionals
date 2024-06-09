@@ -4,7 +4,7 @@ from statsmodels.stats.proportion import proportion_confint
 
 from distribution.final_filter import final_filter
 from distribution.find_closest_indices import find_closest_indices
-from distribution.quantile import quantile_1_minus_alpha
+from distribution.quantile_1_minus_alpha import quantile_1_minus_alpha
 from distribution.second_largest_value import bin_second_largest_values
 from margin import seconds_to_minutes
 from optimization.log_likelihood import log_likelihood_grid
@@ -16,7 +16,6 @@ from utils.multinomial_coefficients import multinomial_coefficient
 from utils.multinomial_probability import calculate_multinomial_probability_grid
 from utils.sample_space import sample_space
 from utils.unique_vector_indices import unique_vector_indices
-from utils.unique_vectors import unique_vectors
 
 
 def get_higher_bound(observation: List[int],
@@ -91,6 +90,7 @@ if __name__ == "__main__":
     print("Final Result:", p2)
     print("Actual p2:", sorted(x_, reverse=True)[1] / n)
     print("Clopper Pearson p2:", 1-p1_)
+    print("Pessimistic p2:", 1-0.8)
     assert (1 - p1_)>p2, "My estimate should be better than the Clopper Pearson estimate"
     end_time = time()  # End time
     time_taken = end_time - start_time

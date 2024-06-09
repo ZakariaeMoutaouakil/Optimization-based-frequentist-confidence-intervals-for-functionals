@@ -3,11 +3,12 @@ from typing import List
 
 from tqdm import tqdm
 
-from optimization.maximize_product import maximize_product
+from optimization.solve_gp import solve_gp
 
 
-def maximize_product_list(x: List[List[int]]) -> List[float]:
-    return [2 * maximize_product(x_i)[0] for x_i in tqdm(x, desc="Maximizing products without threshold")]
+def solve_gp_no_condition(xs: List[List[int]], debug: bool = False) -> List[float]:
+    return [2. * solve_gp(x=x, non_increasing=False, debug=debug)[0] for x in
+            tqdm(xs, desc="Maximizing products without level set")]
 
 
 if __name__ == "__main__":
@@ -19,7 +20,7 @@ if __name__ == "__main__":
     ]
 
     start_time = time()
-    optimal_values = maximize_product_list(x_)
+    optimal_values = solve_gp_no_condition(x_)
     end_time = time()
 
     for value in optimal_values:
