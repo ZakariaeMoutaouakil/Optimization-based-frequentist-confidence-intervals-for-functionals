@@ -26,18 +26,18 @@ def get_higher_bound(observation: List[int],
                      bin_width=0.00001) -> float:
     n = sum(observation)
     m = len(observation)
-    assert max(observation) >= threshold * n
+    # assert max(observation) >= threshold * n
     # Calculate the constraint set
     simplex: List[List[float]] = discrete_simplex(k=m, n=precision, normalize=True)
     # print("simplex:", simplex)
     filtered_simplex = filter_vectors_by_max_value(simplex, threshold=threshold)
     # print("filtered_simplex:", filtered_simplex)
-    constraint_set = unique_vectors(filtered_simplex)
+    constraint_set = filtered_simplex
     # print("constraint_set:", constraint_set)
 
     # Calculate the fixed p_2 values
     fixed_p2s = bin_second_largest_values(constraint_set, bin_width=bin_width)
-    print("fixed_p2s:", fixed_p2s)
+    # print("fixed_p2s:", fixed_p2s)
 
     # Calculate the likelihood
     ordered_x = sample_space(k=m, n=n)

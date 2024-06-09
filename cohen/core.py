@@ -1,7 +1,8 @@
+from math import ceil
+
+import numpy as np
 import torch
 from scipy.stats import norm, binomtest
-import numpy as np
-from math import ceil
 from statsmodels.stats.proportion import proportion_confint
 
 
@@ -37,18 +38,23 @@ class Smooth(object):
         self.base_classifier.eval()
         # draw samples of f(x+ epsilon)
         counts_selection = self._sample_noise(x, n0, batch_size)
+        print("counts_selection: ", counts_selection)
         # use these samples to take a guess at the top class
         cAHat = counts_selection.argmax().item()
         # draw more samples of f(x + epsilon)
         counts_estimation = self._sample_noise(x, n, batch_size)
+        print("counts_estimation:", counts_estimation)
+        # assert counts_estimation.argmax().item() == cAHat, "argmax of counts_estimation must equal cAHat"
         # use these samples to estimate a lower bound on pA
         nA = counts_estimation[cAHat].item()
         pABar = self._lower_confidence_bound(nA, n, alpha)
         if pABar < 0.5:
-            return Smooth.ABSTAIN, 0.0
+            print("Failed!")
+            return Smooth.ABSTAIN, 0.0, counts_estimation, cAHat
         else:
+            print("Certified!")
             radius = self.sigma * norm.ppf(pABar)
-            return cAHat, radius
+            return cAHat, radius, counts_estimation, cAHat
 
     def predict(self, x: torch.tensor, n: int, alpha: float, batch_size: int) -> int:
         """ Monte Carlo algorithm for evaluating the prediction of g at x.  With probability at least 1 - alpha, the
@@ -68,7 +74,6 @@ class Smooth(object):
         top2 = counts.argsort()[::-1][:2]
         count1 = counts[top2[0]]
         count2 = counts[top2[1]]
-        print(counts.tolist())
         if binomtest(count1.item(), count1.item() + count2.item(), p=0.5).pvalue > alpha:
             return Smooth.ABSTAIN
         else:
@@ -89,18 +94,21 @@ class Smooth(object):
                 num -= this_batch_size
 
                 batch = x.repeat((this_batch_size, 1, 1, 1))
-                noise = torch.randn_like(batch, device='cuda') * self.sigma
+                # noise = torch.randn_like(batch, device='cuda') * self.sigma
+                noise = torch.randn_like(batch, device='cpu') * self.sigma
                 predictions = self.base_classifier(batch + noise).argmax(1)
                 counts += self._count_arr(predictions.cpu().numpy(), self.num_classes)
             return counts
 
-    def _count_arr(self, arr: np.ndarray, length: int) -> np.ndarray:
+    @staticmethod
+    def _count_arr(arr: np.ndarray, length: int) -> np.ndarray:
         counts = np.zeros(length, dtype=int)
         for idx in arr:
             counts[idx] += 1
         return counts
 
-    def _lower_confidence_bound(self, NA: int, N: int, alpha: float) -> float:
+    @staticmethod
+    def _lower_confidence_bound(NA: int, N: int, alpha: float) -> float:
         """ Returns a (1 - alpha) lower confidence bound on a bernoulli proportion.
 
         This function uses the Clopper-Pearson method.

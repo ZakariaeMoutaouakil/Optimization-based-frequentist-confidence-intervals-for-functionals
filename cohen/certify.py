@@ -25,7 +25,8 @@ args = parser.parse_args()
 
 if __name__ == "__main__":
     # load the base classifier
-    checkpoint = torch.load(args.base_classifier, map_location=torch.device('cuda'))
+    # checkpoint = torch.load(args.base_classifier, map_location=torch.device('cuda'))
+    checkpoint = torch.load(args.base_classifier, map_location=torch.device('cpu'))
     base_classifier = get_architecture(checkpoint["arch"], args.dataset)
     base_classifier.load_state_dict(checkpoint['state_dict'])
 
@@ -34,7 +35,7 @@ if __name__ == "__main__":
 
     # prepare output file
     f = open(args.outfile, 'w')
-    print("idx\tlabel\tpredict\tradius\tcorrect\ttime", file=f, flush=True)
+    print("idx\tlabel\tpredict\tradius\tcorrect\ttime\tcounts\tprediction", file=f, flush=True)
 
     # iterate through the dataset
     dataset = get_dataset(args.dataset, args.split)
@@ -46,17 +47,19 @@ if __name__ == "__main__":
         if i == args.max:
             break
 
-        (x, label) = dataset[i]
+        x, label = dataset[i]
 
         before_time = time()
         # certify the prediction of g around x
-        x = x.cuda()
-        prediction, radius = smoothed_classifier.certify(x, args.N0, args.N, args.alpha, args.batch)
+        x = x  # .cuda()
+        prediction, radius, counts_estimation, cAHat = smoothed_classifier.certify(x, args.N0, args.N, args.alpha,
+                                                                                   args.batch)
         after_time = time()
         correct = int(prediction == label)
 
         time_elapsed = str(datetime.timedelta(seconds=(after_time - before_time)))
-        print("{}\t{}\t{}\t{:.3}\t{}\t{}".format(
-            i, label, prediction, radius, correct, time_elapsed), file=f, flush=True)
+        print("{}\t{}\t{}\t{:.3}\t{}\t{}\t{}\t{}".format(
+            i, label, prediction, radius, correct, time_elapsed, counts_estimation, cAHat), file=f, flush=True)
 
     f.close()
+# python cohen/certify.py --dataset cifar10 --base_classifier models/cifar10/resnet110/noise_0.12/checkpoint.pth.tar --outfile certification_output.tsv --sigma 0.12 --max 100 --N0 70 --N 100
