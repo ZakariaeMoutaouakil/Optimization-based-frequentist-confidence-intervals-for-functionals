@@ -3,11 +3,11 @@ from typing import List
 
 from tqdm import tqdm
 
-from optimization.solve_gp import solve_gp
+from optimization.solve_gp_permutations import solve_gp_permutations
 
 
 def solve_gp_no_condition(xs: List[List[int]], debug: bool = False) -> List[float]:
-    return [2. * solve_gp(x=x, non_increasing=False, debug=debug)[0] for x in
+    return [2. * solve_gp_permutations(x=x, debug=debug) for x in
             tqdm(xs, desc="Maximizing products without level set")]
 
 

@@ -1,5 +1,7 @@
 from typing import List, Callable
 
+from tqdm import tqdm
+
 
 def margin_of_vector(numbers: List[float]) -> float:
     if len(numbers) < 2:
@@ -19,7 +21,7 @@ def sort_callable_values(vectors: List[List[float]],
                          func: Callable[[List[float]], float],
                          debug: bool = False) -> List[float]:
     # Apply the callable to each vector and store the results in a list
-    results = [func(vector) for vector in vectors]
+    results = [func(vector) for vector in tqdm(vectors, desc="Evaluating images")]
     if debug:
         print("Results:", results)
     # Remove duplicates and sort the list of results

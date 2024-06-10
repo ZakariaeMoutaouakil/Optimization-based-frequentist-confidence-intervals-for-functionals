@@ -2,7 +2,6 @@ from time import time
 from typing import Tuple, List, Callable
 
 from cvxpy import Variable
-from tqdm import tqdm
 
 from distribution.final_step import final_step
 from distribution.generate_quantiles import generate_quantiles
@@ -18,32 +17,32 @@ def seconds_to_minutes(seconds: float) -> Tuple[int, float]:
     return minutes, leftover_seconds
 
 
-n = 14
+n = 12
 m = 3
 
 start_time = time()
 
-grid = 101
+grid = 121
 precision = 0.001
 alpha = 0.05
-threshold = 0.4
 
 # Calculate the constraint set
-constraint_set_unfiltered: List[List[float]] = discrete_simplex(k=m, n=grid, normalize=True)
-constraint_set = [vector for vector in tqdm(constraint_set_unfiltered, desc="Filtering vectors") if
-                  max(vector) > threshold and sorted(vector, reverse=True)[1] > 2 / n]
+# constraint_set_unfiltered: List[List[float]] = discrete_simplex(k=m, n=grid, normalize=True)
+# constraint_set = [vector for vector in tqdm(constraint_set_unfiltered, desc="Filtering vectors") if
+#                   max(vector) > threshold and sorted(vector, reverse=True)[1] > 2 / n]
+constraint_set: List[List[float]] = discrete_simplex(k=m, n=grid, normalize=True)
 
 phi: Callable[[Variable], float] = lambda p: p[1]
-filter_func: Callable[[float], bool] = lambda x: 0 < x < 1 - threshold
+filter_func: Callable[[float], bool] = lambda x: x > 0
 quantiles = generate_quantiles(constraint_set=constraint_set, filter_value=filter_func,
                                func=second_largest, n=n, phi=phi, alpha=alpha,
-                               precision=precision, threshold=threshold, debug=False)
+                               precision=precision, debug=False)
 
-observation = [9, 0, 5]
-assert (sorted(observation, reverse=True)[1] / n) < 1 - threshold
+observation = [10, 1, 1]
+# assert (sorted(observation, reverse=True)[1] / n) < 1 - threshold
 
 final_result = final_step(constraint_set=constraint_set, quantiles=quantiles, observation=observation,
-                          func=second_largest, minimize=False, threshold=threshold, debug=True)
+                          func=second_largest, minimize=False, debug=True)
 print("final result:", final_result)
 print("Actual p2:", sorted(observation, reverse=True)[1] / n)
 assert final_result >= sorted(observation, reverse=True)[1] / n

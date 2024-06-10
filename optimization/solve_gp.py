@@ -1,6 +1,7 @@
+from inspect import getsource
 from math import log
 from time import time
-from typing import List, Tuple, Callable
+from typing import List, Callable
 
 from cvxpy import Variable, Minimize, sum, Problem, power
 
@@ -8,14 +9,12 @@ from cvxpy import Variable, Minimize, sum, Problem, power
 def solve_gp(x: List[int],
              phi: Callable[[Variable], float] = None,
              level_set: float = None,
-             threshold: float = None,
-             non_increasing: bool = True,
-             debug: bool = False) -> Tuple[float, List[float]]:
+             debug: bool = False) -> float:
+    start_time = time() if debug else None
     if debug:
         print("x:", x)
-        print("phi:", phi)
+        print("phi:", getsource(phi).strip() if phi is not None else None)
         print("level_set:", level_set)
-        print("non_increasing:", non_increasing)
 
     m = len(x)
     p = Variable(m, pos=True)
@@ -24,17 +23,8 @@ def solve_gp(x: List[int],
     posynomial_terms = [power(p[i], -x[i]) for i in range(m)]
     posynomial = sum(posynomial_terms)
 
-    constraints = [
-        sum(p) <= 1
-    ]
-
-    if non_increasing:
-        constraints += [(p[i] ** (-1)) * p[i + 1] <= 1 for i in range(m - 1)]
-
-    if threshold is not None:
-        if debug:
-            assert non_increasing, "Non-increasing constraint must be enabled if threshold is provided"
-        constraints.append(sum(p[1:]) <= 1 - threshold)
+    # constraints = [(p[i] ** (-1)) * p[i + 1] <= 1 for i in range(m - 1)] + [sum(p) <= 1]
+    constraints = [sum(p) <= 1]
 
     if phi is not None:
         if debug:
@@ -50,7 +40,18 @@ def solve_gp(x: List[int],
     problem = Problem(objective=objective, constraints=constraints)
     problem.solve(gp=True)
 
-    return -log(problem.value), p.value.tolist()
+    if debug:
+        print("Optimal value:", problem.value)
+        print("Returned value:", -log(problem.value))
+        print("Optimal p values:", p.value.tolist())
+        print("Sum of p values:", sum(p.value.tolist()))
+        if phi is not None:
+            print("Empirical Level set:", phi(p.value))
+            print("Expected Level set:", level_set)
+        end_time = time()
+        print(f"Time taken: {end_time - start_time:.6f} seconds\n")
+
+    return -log(problem.value)
 
 
 if __name__ == "__main__":
@@ -58,54 +59,24 @@ if __name__ == "__main__":
     x_ = [1, 1, 1, 1, 1, 1]
     margin_ = 1.5
     func: Callable[[Variable], float] = lambda p: p[0] * (p[1] ** (-1))
-
-    start_time = time()
-    optimal_value, optimal_p_values = solve_gp(x_, phi=func, level_set=margin_, debug=True)
-    end_time = time()
-
-    print("Optimal value:", optimal_value)
-    print("Optimal p values:", optimal_p_values)
-    print("Sum of p values:", sum(optimal_p_values))
-    print("Margin:", func(optimal_p_values))
-    print(f"Time taken: {end_time - start_time:.6f} seconds\n")
+    solve_gp(x_, phi=func, level_set=margin_, debug=True)
 
     # Example usage without margin
-    x_ = [1, 1, 1, 1, 1, 1]
-    start_time = time()
-    optimal_value, optimal_p_values = solve_gp(x_, debug=True)
-    end_time = time()
+    x_ = [10, 5, 3, 1]
+    solve_gp(x_, debug=True)
 
-    print("Optimal value:", optimal_value)
-    print("Optimal p values:", optimal_p_values)
-    print("Sum of p values:", sum(optimal_p_values))
-    print(f"Time taken: {end_time - start_time:.6f} seconds\n")
+    # Example usage without margin
+    x_ = [1, 5, 10, 3]
+    solve_gp(x_, debug=True)
 
     # Example usage with fixed second largest p
     x_ = [1, 1, 1, 1, 1, 1]
     second_largest = 0.4
     func: Callable[[Variable], float] = lambda p: p[1]
-
-    start_time = time()
-    optimal_value, optimal_p_values = solve_gp(x_, phi=func, level_set=second_largest, debug=True)
-    end_time = time()
-
-    print("Optimal value:", optimal_value)
-    print("Optimal p values:", optimal_p_values)
-    print("Sum of p values:", sum(optimal_p_values))
-    print("Second largest:", func(optimal_p_values))
-    print(f"Time taken: {end_time - start_time:.6f} seconds\n")
+    solve_gp(x_, phi=func, level_set=second_largest, debug=True)
 
     # Example usage with fixed second largest p
     x_ = [1, 1, 1, 1, 1, 1]
     second_largest = 0.1
     func: Callable[[Variable], float] = lambda p: p[1]
-
-    start_time = time()
-    optimal_value, optimal_p_values = solve_gp(x_, phi=func, level_set=second_largest, debug=True, threshold=0.8)
-    end_time = time()
-
-    print("Optimal value:", optimal_value)
-    print("Optimal p values:", optimal_p_values)
-    print("Sum of p values:", sum(optimal_p_values))
-    print("Second largest:", func(optimal_p_values))
-    print(f"Time taken: {end_time - start_time:.6f} seconds\n")
+    solve_gp(x_, phi=func, level_set=second_largest, debug=True)

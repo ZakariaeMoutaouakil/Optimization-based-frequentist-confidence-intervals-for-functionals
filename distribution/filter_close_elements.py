@@ -1,5 +1,7 @@
 from typing import List
 
+from tqdm import tqdm
+
 
 def filter_close_elements(values: List[float], precision: float) -> List[float]:
     if not values:
@@ -9,7 +11,7 @@ def filter_close_elements(values: List[float], precision: float) -> List[float]:
     values.sort()
     filtered_values = [values[0]]
 
-    for value in values[1:]:
+    for value in tqdm(values[1:], desc="Filtering close elements"):
         if abs(value - filtered_values[-1]) >= precision:
             filtered_values.append(value)
 

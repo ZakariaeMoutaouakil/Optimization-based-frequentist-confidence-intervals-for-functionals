@@ -54,7 +54,7 @@ def discrete_simplex(k: int, n: int, normalize: bool = True) -> Union[List[List[
 
     simplex = []
 
-    for comb in tqdm(generate_combinations(k, n), total=num_combinations, desc="Generating simplex"):
+    for comb in tqdm(generate_combinations(k, n), total=num_combinations, desc="Generating full simplex"):
         if normalize:
             normalized_point = [x / n for x in comb]
             simplex.append(normalized_point)
