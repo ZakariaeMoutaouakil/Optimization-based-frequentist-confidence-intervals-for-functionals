@@ -23,12 +23,13 @@ def solve_gp(x: List[int],
     posynomial_terms = [power(p[i], -x[i]) for i in range(m)]
     posynomial = sum(posynomial_terms)
 
-    # constraints = [(p[i] ** (-1)) * p[i + 1] <= 1 for i in range(m - 1)] + [sum(p) <= 1]
     constraints = [sum(p) <= 1]
 
     if phi is not None:
         if debug:
             assert level_set is not None, "Level set must be provided if phi is provided"
+            assert x == sorted(x, reverse=True), "x must be sorted in descending order if phi is provided"
+        constraints += [(p[i] ** (-1)) * p[i + 1] <= 1 for i in range(m - 1)]
         constraints.append(phi(p) == level_set)
 
     if debug:
@@ -41,8 +42,8 @@ def solve_gp(x: List[int],
     problem.solve(gp=True)
 
     if debug:
-        print("Optimal value:", problem.value)
         print("Returned value:", -log(problem.value))
+        print("Optimal value:", problem.value)
         print("Optimal p values:", p.value.tolist())
         print("Sum of p values:", sum(p.value.tolist()))
         if phi is not None:
@@ -76,7 +77,7 @@ if __name__ == "__main__":
     solve_gp(x_, phi=func, level_set=second_largest, debug=True)
 
     # Example usage with fixed second largest p
-    x_ = [1, 1, 1, 1, 1, 1]
+    x_ = [10, 5, 3, 1]
     second_largest = 0.1
     func: Callable[[Variable], float] = lambda p: p[1]
     solve_gp(x_, phi=func, level_set=second_largest, debug=True)

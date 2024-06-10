@@ -5,7 +5,7 @@ from typing import List, Callable
 from tqdm import tqdm
 
 from distribution.sort_callable_values import sort_callable_values, second_largest
-from optimization.solve_gp_permutations import solve_gp_permutations
+from optimization.solve_gp import solve_gp
 
 
 # Define the sum with the modified conditions
@@ -34,17 +34,12 @@ def final_step(constraint_set: List[List[float]],
                func: Callable[[List[float]], float],
                minimize: bool,
                debug: bool = False) -> float:
-    maximum_likelihood = -2. * solve_gp_permutations(x=observation, debug=debug)
+    maximum_likelihood = -2. * solve_gp(x=observation, debug=debug)
     if debug:
         print("maximum_likelihood:", maximum_likelihood)
 
     final_candidates = []
     for i in tqdm(range(len(constraint_set)), desc="Filtering final candidates"):
-        # if 0. in constraint_set[i]:
-        #     if debug:
-        #         print("Skipping vector:", constraint_set[i])
-        #     continue
-        # likelihood = -2 * sum([xi * log(pi) for pi, xi in zip(constraint_set[i], observation) if pi != 0])
         likelihood = -2. * custom_sum(constraint_set=constraint_set, observation=observation, i=i)
         if debug:
             print("constraint:", constraint_set[i])

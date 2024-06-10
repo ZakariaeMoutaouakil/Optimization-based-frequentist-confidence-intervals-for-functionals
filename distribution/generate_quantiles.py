@@ -34,10 +34,10 @@ def generate_quantiles(constraint_set: List[List[float]],
     level_sets = [x for x in tqdm(level_sets_unfiltered, desc="Filtering level sets") if filter_value(x)]
 
     # Calculate the likelihood
-
     ordered_x = sample_space(k=m, n=n)
-    second_terms = solve_gp_no_condition(xs=ordered_x, debug=debug)
-    likelihood = solve_gp_multiple(xs=ordered_x, phi=phi, level_sets=level_sets, second_terms=second_terms, debug=debug)
+    second_terms = solve_gp_no_condition(sample_space=ordered_x, debug=debug)
+    likelihood = solve_gp_multiple(sample_space=ordered_x, phi=phi, level_sets=level_sets, second_terms=second_terms,
+                                   debug=debug)
     full_x: List[List[int]] = discrete_simplex(k=m, n=n, normalize=False)
     x_indices = unique_vector_indices(raw_vectors=full_x, unique_vectors=ordered_x)
     full_likelihood = enlarge_matrix(unique_matrix=likelihood, mapping=x_indices)

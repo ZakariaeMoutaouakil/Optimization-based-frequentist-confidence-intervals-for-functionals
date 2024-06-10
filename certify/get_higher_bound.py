@@ -6,7 +6,7 @@ from distribution.final_filter import final_filter
 from distribution.find_closest_indices import find_closest_indices
 from distribution.quantile_1_minus_alpha import quantile_1_minus_alpha
 from distribution.second_largest_value import bin_second_largest_values
-from margin import seconds_to_minutes
+from max import seconds_to_minutes
 from optimization.log_likelihood import log_likelihood_grid
 from utils.discrete_simplex import discrete_simplex
 from utils.enlarge_matrix import enlarge_matrix

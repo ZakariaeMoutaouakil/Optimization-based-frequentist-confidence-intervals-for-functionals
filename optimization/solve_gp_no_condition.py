@@ -3,12 +3,14 @@ from typing import List
 
 from tqdm import tqdm
 
-from optimization.solve_gp_permutations import solve_gp_permutations
+from optimization.solve_gp import solve_gp
 
 
-def solve_gp_no_condition(xs: List[List[int]], debug: bool = False) -> List[float]:
-    return [2. * solve_gp_permutations(x=x, debug=debug) for x in
-            tqdm(xs, desc="Maximizing products without level set")]
+def solve_gp_no_condition(sample_space: List[List[int]], debug: bool = False) -> List[float]:
+    return [
+        2. * solve_gp(x=x, debug=debug)
+        for x in tqdm(sample_space, desc="Maximizing products without level set")
+    ]
 
 
 if __name__ == "__main__":
@@ -20,7 +22,7 @@ if __name__ == "__main__":
     ]
 
     start_time = time()
-    optimal_values = solve_gp_no_condition(x_)
+    optimal_values = solve_gp_no_condition(x_, debug=True)
     end_time = time()
 
     for value in optimal_values:
