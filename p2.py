@@ -6,7 +6,6 @@ from statsmodels.stats.proportion import proportion_confint
 
 from distribution.final_step import final_step
 from distribution.generate_quantiles import generate_quantiles
-from distribution.sort_callable_values import second_largest
 from lower_bound.final_result import final_result
 from utils.discrete_simplex import discrete_simplex
 
@@ -19,7 +18,7 @@ def seconds_to_minutes(seconds: float) -> Tuple[int, float]:
     return minutes, leftover_seconds
 
 
-observation = [11, 7, 0]
+observation = [11, 1, 0]
 
 n = sum(observation)
 m = len(observation)
@@ -33,13 +32,14 @@ alpha = 0.001
 constraint_set: List[List[float]] = discrete_simplex(k=m, n=grid, normalize=True)
 
 phi: Callable[[Variable], float] = lambda p: p[1]
+func: Callable[[List[float]], float] = lambda p: p[1]
 filter_func: Callable[[float], bool] = lambda x: x > 0
 quantiles = generate_quantiles(constraint_set=constraint_set, filter_value=filter_func,
-                               func=second_largest, n=n, phi=phi, alpha=alpha,
+                               func=func, n=n, phi=phi, alpha=alpha,
                                precision=precision, debug=False)
 
 final_res = final_step(constraint_set=constraint_set, quantiles=quantiles, observation=observation,
-                       func=second_largest, minimize=False, debug=True)
+                       func=func, minimize=False, debug=True)
 print("Actual p2         :", sorted(observation, reverse=True)[1] / n)
 print("Expected p2       :", final_res)
 assert final_res >= sorted(observation, reverse=True)[1] / n

@@ -17,16 +17,16 @@ def seconds_to_minutes(seconds: float) -> Tuple[int, float]:
     return minutes, leftover_seconds
 
 
-observation = [7, 3, 1, 2]
+observation = [11, 7, 0]
 
 n = sum(observation)
 m = len(observation)
 
 start_time = time()
 
-grid = 121
+grid = 51
 precision = 0.001
-alpha = 0.05
+alpha = 0.001
 
 constraint_set: List[List[float]] = discrete_simplex(k=m, n=grid, normalize=True)
 
@@ -38,10 +38,11 @@ quantiles = generate_quantiles(constraint_set=constraint_set, filter_value=filte
 
 final_result = final_step(constraint_set=constraint_set, quantiles=quantiles, observation=observation,
                           func=max, minimize=True, debug=True)
-print("final result:", final_result)
-print("Actual p1:", sorted(observation, reverse=True)[0] / n)
+print("Actual p1         :", sorted(observation, reverse=True)[0] / n)
+print("Expected p1       :", final_result)
 p1_ = proportion_confint(max(observation), n, alpha=2 * alpha, method="beta")[0]
 print("Clopper Pearson p1:", p1_)
+assert final_result > p1_, "My estimate should be better than the Clopper Pearson estimate"
 end_time = time()
 time_taken = end_time - start_time
 if time_taken >= 60:
