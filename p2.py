@@ -1,5 +1,5 @@
 from time import time
-from typing import Tuple, List, Callable
+from typing import Tuple, Callable
 
 from cvxpy import Variable
 from statsmodels.stats.proportion import proportion_confint
@@ -18,7 +18,7 @@ def seconds_to_minutes(seconds: float) -> Tuple[int, float]:
     return minutes, leftover_seconds
 
 
-observation = [11, 1, 0]
+observation = (11, 1, 0)
 
 n = sum(observation)
 m = len(observation)
@@ -29,10 +29,10 @@ grid = 101
 precision = 0.001
 alpha = 0.001
 
-constraint_set: List[List[float]] = discrete_simplex(k=m, n=grid, normalize=True)
+constraint_set: Tuple[Tuple[float, ...], ...] = discrete_simplex(k=m, n=grid, normalize=True)
 
 phi: Callable[[Variable], float] = lambda p: p[1]
-func: Callable[[List[float]], float] = lambda p: p[1]
+func: Callable[[Tuple[float, ...]], float] = lambda p: p[1]
 filter_func: Callable[[float], bool] = lambda x: x > 0
 quantiles = generate_quantiles(constraint_set=constraint_set, filter_value=filter_func,
                                func=func, n=n, phi=phi, alpha=alpha,

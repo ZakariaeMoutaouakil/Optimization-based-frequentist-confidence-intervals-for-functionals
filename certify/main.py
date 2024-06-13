@@ -1,33 +1,24 @@
+import argparse
 import ast
-import re
-from typing import List
+from time import time
+from typing import List, Tuple, Dict, Callable
 
 import pandas as pd
+from cvxpy import Variable
 from scipy.stats import norm
 
 from certify.smallest_subset import smallest_subset
-from lower_bound.final_result import final_result
+from distribution.final_step import final_step
+from distribution.generate_quantiles import generate_quantiles
+from distribution.sort_callable_values import second_largest
+from lower_bound.get_quantiles import get_quantiles
+from lower_bound.max_first_coordinate import max_first_coordinate
+from utils.discrete_simplex import discrete_simplex
 
-
-# Function to preprocess the counts column
-def add_commas_to_counts(line: str) -> str:
-    return re.sub(r'\[\s*(.*?)\s*\]', lambda m: '[' + ', '.join(m.group(1).split()) + ']', line)
-
-
-# Path to your TSV file
-file_path = '../certification_output.tsv'
-
-# Read and preprocess the file
-with open(file_path, 'r') as file:
-    lines = file.readlines()
-
-# Apply preprocessing to each line
-preprocessed_lines = [add_commas_to_counts(line) for line in lines]
-
-# Write the preprocessed lines to a new file (optional, or you can use StringIO to avoid creating a new file)
-preprocessed_file_path = 'preprocessed_data.tsv'
-with open(preprocessed_file_path, 'w') as file:
-    file.writelines(preprocessed_lines)
+parser = argparse.ArgumentParser(description='Certify many examples')
+parser.add_argument("--data", type=str, help="Location of tsv data")
+parser.add_argument("--outfile", type=str, help="Location of output tsv file")
+args = parser.parse_args()
 
 # Define the data types for each column
 dtype_dict = {
@@ -40,45 +31,81 @@ dtype_dict = {
 }
 
 # Read the preprocessed TSV data into a DataFrame with specified dtypes
-df = pd.read_csv(preprocessed_file_path, sep='\t', dtype=dtype_dict, converters={'counts': ast.literal_eval})
+df = pd.read_csv(args.data, sep='\t', dtype=dtype_dict, converters={'counts': ast.literal_eval})
 
-# Display the DataFrame with correct types
-print(df)
-print(df.dtypes)
-num_partitions = 3
+k = 3
+n = sum(df.iloc[0]['counts'])
+grid = 101
+alpha = 0.001
+precision = 0.01
+step = 0.1
 sigma = 0.12
-alpha = 0.05
+
+constraint_set: Tuple[Tuple[float, ...], ...] = discrete_simplex(k=k, n=grid, normalize=True)
+
+phi: Callable[[Variable], float] = lambda p: p[1]
+filter_func: Callable[[float], bool] = lambda x: x > 0
+quantiles_p2 = generate_quantiles(constraint_set=constraint_set, filter_value=filter_func, func=second_largest, n=n,
+                                  phi=phi, alpha=alpha, precision=precision, debug=False)
+quantiles_p1 = get_quantiles(alpha=alpha, n=n, m=k, step=step)
+
+# Dictionary to cache results and time of final_result function
+final_result_cache: Dict[Tuple[int, ...], Tuple[Tuple[float, float], float]] = {}
+elapsed_time, cached_time = 0., 0.
+
 for i in range(len(df)):
     print("old:", df.iloc[i])
     counts: List[int] = df.iloc[i]['counts']
-    observation = [counts[len(counts) - 1]]
-    rest = counts[:len(counts) - 1]
-    i = smallest_subset(vector=rest, num_partitions=num_partitions - 1, debug=False)
-    second_class = counts[:i]
-    observation.append(sum(second_class))
-    third_classes = counts[i:len(counts) - 1]
-    observation.append(sum(third_classes))
-    observation = sorted(observation)
-    print("observation:", observation)
-    p1 = final_result(alpha=alpha, x=observation)
-    print("p1:", p1)
-    if p1 >= 0.5:
-        df.loc[df.index[i], 'radius'] = sigma * norm.ppf(p1)
-        prediction: int = df.iloc[i]['prediction']
-        df.loc[df.index[i], 'predict'] = prediction
-        df.loc[df.index[i], 'correct'] = int(prediction == df.iloc[i]['label'])
+    prediction = counts.index(max(counts))
+    print("counts:", counts)
+    print("prediction:", prediction)
+    observation = sorted(smallest_subset(vector=sorted(counts), num_partitions=k))
+    reduced_counts = [int(x) for x in observation]
+    reduced_counts_tuple = tuple(reduced_counts)
+    print("reduced_counts:", reduced_counts)
+    radius = 0.
+
+    if reduced_counts_tuple in final_result_cache:
+        radius, cached_time = final_result_cache[reduced_counts_tuple]
     else:
-        df.loc[df.index[i], 'radius'] = 0.
-        prediction = -1
-        df.loc[df.index[i], 'predict'] = prediction
-        df.loc[df.index[i], 'correct'] = 0
+        start_time = time()
+        p1 = max_first_coordinate(quantiles=quantiles_p1, maximum=max(reduced_counts))
+        print("p1:", p1)
+        p2 = 1 - p1
+        print("p2:", p2)
+        try:
+            p2_ = final_step(constraint_set=constraint_set, quantiles=quantiles_p2, observation=reduced_counts_tuple,
+                             func=second_largest, minimize=False, debug=False)
+            print("p2_:", p2_)
+            p2 = min(p2, p2_)
+        except Exception as e:
+            pass
+        end_time = time()
+        elapsed_time = end_time - start_time
+        print("time:", elapsed_time)
+        # Cache the result and time
+        if p2 < p1:
+            radius = 0.5 * sigma * norm.ppf(p1) - norm.ppf(p2)
+        else:
+            prediction = -1
+        print("radius:", radius)
+        final_result_cache[reduced_counts_tuple] = (radius, elapsed_time)
+
+    df.loc[df.index[i], 'radius'] = radius
+    df.loc[df.index[i], 'correct'] = int(prediction == df.iloc[i]['label'])
+    df.loc[df.index[i], 'predict'] = prediction
+
+    if reduced_counts_tuple not in final_result_cache:
+        df.loc[df.index[i], 'time'] = f"{elapsed_time:.6f}"
+    else:
+        df.loc[df.index[i], 'time'] = f"{cached_time:.6f}"
     print("new:", df.iloc[i])
 
 # Remove the last three columns
-df_modified = df.iloc[:, :-3]  # This slices out all rows and all columns except the last three
+df_modified = df.iloc[:, :-2]  # This slices out all rows and all columns except the last two
 
 # Save to TSV file
-df_modified.to_csv('modified_data.tsv', sep='\t',
+df_modified.to_csv(args.outfile, sep='\t',
                    index=False)  # Set index=False if you don't want to save the index as a separate column
 # raw_vectors: List[List[int]] = df['counts'].to_list()
 # for i in range(len(raw_vectors)):
