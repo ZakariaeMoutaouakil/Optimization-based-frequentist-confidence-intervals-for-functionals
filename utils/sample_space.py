@@ -1,13 +1,13 @@
 from time import time
-from typing import List
+from typing import List, Tuple
 
 from tqdm import tqdm
 
 
-def backtrack(start: int, dim: int, num: int, path: List[int], res: List[List[int]], progress_bar=None) -> None:
+def backtrack(start: int, dim: int, num: int, path: List[int], res: List[Tuple[int, ...]], progress_bar=None) -> None:
     if dim == 0:
         if num == 0:
-            res.append(path.copy())
+            res.append(tuple(path.copy()))
         return
     for i in range(start, -1, -1):
         if i <= num:
@@ -18,12 +18,12 @@ def backtrack(start: int, dim: int, num: int, path: List[int], res: List[List[in
             path.pop()
 
 
-def sample_space(k: int, n: int) -> List[List[int]]:
-    result: List[List[int]] = []
+def sample_space(k: int, n: int) -> Tuple[Tuple[int, ...], ...]:
+    result: List[Tuple[int, ...]] = []
     total_steps = sum(range(n + 1))  # Approximation of total steps for tqdm
     with tqdm(total=total_steps, desc="Generating sample space") as progress_bar:
         backtrack(n, k, n, [], result, progress_bar)
-    return result
+    return tuple(result)
 
 
 if __name__ == "__main__":

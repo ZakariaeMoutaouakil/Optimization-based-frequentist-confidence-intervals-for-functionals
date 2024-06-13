@@ -1,12 +1,12 @@
 from inspect import getsource
 from math import log
 from time import time
-from typing import List, Callable
+from typing import Tuple, Callable
 
 from cvxpy import Variable, Minimize, sum, Problem, power
 
 
-def solve_gp(x: List[int],
+def solve_gp(x: Tuple[int, ...],
              phi: Callable[[Variable], float] = None,
              level_set: float = None,
              debug: bool = False) -> float:
@@ -28,7 +28,7 @@ def solve_gp(x: List[int],
     if phi is not None:
         if debug:
             assert level_set is not None, "Level set must be provided if phi is provided"
-            assert x == sorted(x, reverse=True), "x must be sorted in descending order if phi is provided"
+            assert x == tuple(sorted(x, reverse=True)), "x must be sorted in descending order if phi is provided"
         constraints += [(p[i] ** (-1)) * p[i + 1] <= 1 for i in range(m - 1)]
         constraints.append(phi(p) == level_set)
 
@@ -57,27 +57,23 @@ def solve_gp(x: List[int],
 
 if __name__ == "__main__":
     # Example usage with margin
-    x_ = [1, 1, 1, 1, 1, 1]
+    x_ = (1, 1, 1, 1, 1, 1)
     margin_ = 1.5
     func: Callable[[Variable], float] = lambda p: p[0] * (p[1] ** (-1))
     solve_gp(x_, phi=func, level_set=margin_, debug=True)
 
     # Example usage without margin
-    x_ = [10, 5, 3, 1]
-    solve_gp(x_, debug=True)
-
-    # Example usage without margin
-    x_ = [1, 5, 10, 3]
+    x_ = (10, 5, 3, 1)
     solve_gp(x_, debug=True)
 
     # Example usage with fixed second largest p
-    x_ = [1, 1, 1, 1, 1, 1]
+    x_ = (1, 1, 1, 1, 1, 1)
     second_largest = 0.4
     func: Callable[[Variable], float] = lambda p: p[1]
     solve_gp(x_, phi=func, level_set=second_largest, debug=True)
 
     # Example usage with fixed second largest p
-    x_ = [10, 5, 3, 1]
+    x_ = (10, 5, 3, 1)
     second_largest = 0.1
     func: Callable[[Variable], float] = lambda p: p[1]
     solve_gp(x_, phi=func, level_set=second_largest, debug=True)

@@ -1,7 +1,7 @@
 import math
 import sys
 from time import time
-from typing import List, Union
+from typing import Tuple, Union
 
 from tqdm import tqdm
 
@@ -29,7 +29,8 @@ def get_total_size(obj, seen=None):
     return size / (1024 ** 2)
 
 
-def discrete_simplex(k: int, n: int, normalize: bool = True) -> Union[List[List[float]], List[List[int]]]:
+def discrete_simplex(k: int, n: int, normalize: bool) \
+        -> Union[Tuple[Tuple[float, ...], ...], Tuple[Tuple[int, ...], ...]]:
     """
     Generate the discrete simplex for k coordinates and common denominator n.
 
@@ -38,16 +39,16 @@ def discrete_simplex(k: int, n: int, normalize: bool = True) -> Union[List[List[
     n (int): The common denominator.
 
     Returns:
-    List[List[float]]: A list of lists representing the discrete simplex points.
+    Tuple[Tuple[float, ...], ...]: A tuple of tuples representing the discrete simplex points.
     """
 
     def generate_combinations(dim, num):
         if dim == 1:
-            yield [num]
+            yield (num,)
         else:
             for i in range(num + 1):
                 for sub_comb in generate_combinations(dim - 1, num - i):
-                    yield [i] + sub_comb
+                    yield (i,) + sub_comb
 
     # Calculate the number of combinations
     num_combinations = math.comb(n + k - 1, k - 1)
@@ -56,12 +57,12 @@ def discrete_simplex(k: int, n: int, normalize: bool = True) -> Union[List[List[
 
     for comb in tqdm(generate_combinations(k, n), total=num_combinations, desc="Generating full simplex"):
         if normalize:
-            normalized_point = [x / n for x in comb]
+            normalized_point = tuple(x / n for x in comb)
             simplex.append(normalized_point)
         else:
             simplex.append(comb)
 
-    return simplex
+    return tuple(simplex)
 
 
 if __name__ == "__main__":

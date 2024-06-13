@@ -1,31 +1,32 @@
 from time import time
-from typing import List
+from typing import Tuple
 
 from tqdm import tqdm
 
 
-def filter_vectors_by_max_value(vectors: List[List[float]], threshold: float) -> List[List[float]]:
+def filter_vectors_by_max_value(vectors: Tuple[Tuple[float, ...], ...], threshold: float) \
+        -> Tuple[Tuple[float, ...], ...]:
     """
-    Filters a list of vectors based on the condition that their largest value must be bigger than a certain threshold.
+    Filters a tuple of tuples based on the condition that their largest value must be bigger than a certain threshold.
 
     Args:
-    - vectors (List[List[float]]): A list of vectors (each vector is a list of floats).
+    - vectors (Tuple[Tuple[float, ...], ...]): A tuple of vectors (each vector is a tuple of floats).
     - threshold (float): The threshold value.
 
     Returns:
-    - List[List[float]]: A filtered list of vectors.
+    - Tuple[Tuple[float, ...], ...]: A filtered tuple of vectors.
     """
-    return [vector for vector in tqdm(vectors, desc="Filtering vectors") if max(vector) > threshold]
+    return tuple(vector for vector in tqdm(vectors, desc="Filtering vectors") if max(vector) > threshold)
 
 
 if __name__ == "__main__":
     # Example usage
-    vecs = [
-        [0.1, 0.2, 0.3],
-        [0.5, 0.4, 0.6],
-        [0.7, 0.8, 0.9],
-        [0.2, 0.3, 0.1]
-    ]
+    vecs = (
+        (0.1, 0.2, 0.3),
+        (0.5, 0.4, 0.6),
+        (0.7, 0.8, 0.9),
+        (0.2, 0.3, 0.1)
+    )
     thresh = 0.5
 
     start_time = time()

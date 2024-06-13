@@ -1,17 +1,17 @@
-from typing import List
+from typing import Tuple
 
 from tqdm import tqdm
 
 
-def unique_vectors(vectors: List[List[float]]) -> List[List[float]]:
+def unique_vectors(vectors: Tuple[Tuple[float, ...], ...]) -> Tuple[Tuple[float, ...], ...]:
     """
-    Returns a list of unique vectors, where uniqueness is determined by converting each vector to a set.
+    Returns a tuple of unique vectors, where uniqueness is determined by converting each vector to a set.
 
     Args:
-    - vectors (List[List[float]]): A list of vectors (each vector is a list of floats).
+    - vectors (Tuple[Tuple[float, ...], ...]): A tuple of vectors (each vector is a tuple of floats).
 
     Returns:
-    - List[List[float]]: A list of unique vectors.
+    - Tuple[Tuple[float, ...], ...]: A tuple of unique vectors.
     """
     # Use a set to keep track of unique vectors
     seen = set()
@@ -23,18 +23,18 @@ def unique_vectors(vectors: List[List[float]]) -> List[List[float]]:
             seen.add(vector_set)
             unique_list.append(vector)
 
-    return unique_list
+    return tuple(unique_list)
 
 
 if __name__ == "__main__":
     # Example usage
-    vecs = [
-        [0.1, 0.2, 0.3],
-        [0.3, 0.2, 0.1],
-        [0.5, 0.4, 0.6],
-        [0.7, 0.8, 0.9],
-        [0.2, 0.1, 0.3]
-    ]
+    vecs = (
+        (0.1, 0.2, 0.3),
+        (0.3, 0.2, 0.1),
+        (0.5, 0.4, 0.6),
+        (0.7, 0.8, 0.9),
+        (0.2, 0.1, 0.3)
+    )
 
     unique_vectors_list = unique_vectors(vecs)
     print("Unique vectors:", unique_vectors_list)

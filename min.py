@@ -1,5 +1,5 @@
 from time import time
-from typing import Tuple, List, Callable
+from typing import Tuple, Callable
 
 from cvxpy import Variable
 from statsmodels.stats.proportion import proportion_confint
@@ -19,7 +19,7 @@ def seconds_to_minutes(seconds: float) -> Tuple[int, float]:
     return minutes, leftover_seconds
 
 
-observation = [11, 7, 0]
+observation = (18, 10, 0)
 
 n = sum(observation)
 m = len(observation)
@@ -30,7 +30,7 @@ grid = 101
 precision = 0.001
 alpha = 0.001
 
-constraint_set: List[List[float]] = discrete_simplex(k=m, n=grid, normalize=True)
+constraint_set: Tuple[Tuple[float, ...], ...] = discrete_simplex(k=m, n=grid, normalize=True)
 
 phi: Callable[[Variable], float] = lambda p: p[1]
 filter_func: Callable[[float], bool] = lambda x: x > 0
@@ -45,7 +45,7 @@ print("Expected p2       :", final_res)
 assert final_res >= sorted(observation, reverse=True)[1] / n
 p1_ = proportion_confint(max(observation), n, alpha=2 * alpha, method="beta")[0]
 print("Clopper Pearson p2:", 1 - p1_)
-p1 = final_result(alpha=alpha, x=observation)
+p1 = final_result(alpha=alpha, x=list(observation))
 print("Maximum method    :", 1 - p1)
 print("p1_:", p1_)
 end_time = time()

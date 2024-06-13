@@ -1,4 +1,4 @@
-from typing import List, Callable
+from typing import Callable, Tuple
 
 from cvxpy import Variable
 from tqdm import tqdm
@@ -18,27 +18,27 @@ from utils.sample_space import sample_space
 from utils.unique_vector_indices import unique_vector_indices
 
 
-def generate_quantiles(constraint_set: List[List[float]],
+def generate_quantiles(constraint_set: Tuple[Tuple[float, ...], ...],
                        n: int,
                        phi: Callable[[Variable], float],
-                       func: Callable[[List[float]], float],
+                       func: Callable[[Tuple[float, ...]], float],
                        alpha: float,
                        precision: float,
                        filter_value: Callable[[float], bool] = lambda x: True,
-                       debug: bool = False) -> List[float]:
+                       debug: bool = False) -> Tuple[float, ...]:
     m = len(constraint_set[0])
 
     # Calculate the level sets
     values = sort_callable_values(vectors=constraint_set, func=func, debug=debug)
     level_sets_unfiltered = filter_close_elements(values=values, precision=precision)
-    level_sets = [x for x in tqdm(level_sets_unfiltered, desc="Filtering level sets") if filter_value(x)]
+    level_sets = tuple(x for x in tqdm(level_sets_unfiltered, desc="Filtering level sets") if filter_value(x))
 
     # Calculate the likelihood
     ordered_x = sample_space(k=m, n=n)
     second_terms = solve_gp_no_condition(sample_space=ordered_x, debug=debug)
     likelihood = solve_gp_multiple(sample_space=ordered_x, phi=phi, level_sets=level_sets, second_terms=second_terms,
                                    debug=debug)
-    full_x: List[List[int]] = discrete_simplex(k=m, n=n, normalize=False)
+    full_x: Tuple[Tuple[int, ...], ...] = discrete_simplex(k=m, n=n, normalize=False)
     x_indices = unique_vector_indices(raw_vectors=full_x, unique_vectors=ordered_x)
     full_likelihood = enlarge_matrix(unique_matrix=likelihood, mapping=x_indices)
 
@@ -51,9 +51,9 @@ def generate_quantiles(constraint_set: List[List[float]],
 
     # Calculate the quantiles
     indices = find_closest_indices(vectors=constraint_set, values=level_sets, func=func)
-    quantiles = [
+    quantiles = tuple(
         quantile_1_minus_alpha(values=full_likelihood[indices[i]], probabilities=probabilities[i], alpha=alpha)
         for i in range(len(probabilities))
-    ]
+    )
 
     return quantiles

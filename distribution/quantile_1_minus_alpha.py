@@ -1,13 +1,13 @@
-from typing import List
+from typing import Tuple
 
 
-def quantile_1_minus_alpha(values: List[float], probabilities: List[float], alpha: float) -> float:
+def quantile_1_minus_alpha(values: Tuple[float, ...], probabilities: Tuple[float, ...], alpha: float) -> float:
     """
     Calculate the quantile of order 1 - alpha for a discrete random variable with finite support.
 
     Args:
-    - values (List[float]): List of values taken by the discrete random variable.
-    - probabilities (List[float]): Corresponding probabilities of each value.
+    - values (Tuple[float, ...]): Tuple of values taken by the discrete random variable.
+    - probabilities (Tuple[float, ...]): Corresponding probabilities of each value.
     - alpha (float): The significance level.
 
     Returns:
@@ -31,8 +31,8 @@ def quantile_1_minus_alpha(values: List[float], probabilities: List[float], alph
 
 if __name__ == "__main__":
     # Example usage
-    vals = [1, 2, 3, 4, 5]
-    probas = [0.1, 0.2, 0.3, 0.2, 0.2]
+    vals = (1, 2, 3, 4, 5)
+    probas = (0.1, 0.2, 0.3, 0.2, 0.2)
     risk = 0.5
 
     quantile = quantile_1_minus_alpha(vals, probas, risk)
