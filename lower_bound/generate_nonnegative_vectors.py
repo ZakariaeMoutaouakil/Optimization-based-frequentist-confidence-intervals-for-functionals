@@ -1,8 +1,8 @@
 import random
-from typing import Iterator, List
+from typing import Iterator, Tuple
 
 
-def generate_nonnegative_vectors(num_iters: int, dim: int, max_coord: int, bias: float) -> Iterator[List[int]]:
+def generate_nonnegative_vectors(num_iters: int, dim: int, max_coord: int, bias: float) -> Iterator[Tuple[int, ...]]:
     """
     Generate an iterator of vectors with nonnegative coordinates.
 
@@ -16,23 +16,23 @@ def generate_nonnegative_vectors(num_iters: int, dim: int, max_coord: int, bias:
     Iterator[List[int]]: An iterator that yields vectors of the specified dimension with nonnegative coordinates.
     """
 
-    def vector_generator(num_iters: int, dim: int, max_coord: int, bias: float) -> Iterator[List[int]]:
-        for _ in range(num_iters):
-            vector = [random.randint(0, max_coord) for _ in range(dim)]
-            biased_index = random.randint(0, dim - 1)
-            vector[biased_index] = min(max_coord, int(vector[biased_index] * bias))
-            yield vector
+    def vector_generator(num_iterations: int, dimension: int, max_: int, bias__: float) -> Iterator[Tuple[int, ...]]:
+        for _ in range(num_iterations):
+            vector = [random.randint(0, max_) for _ in range(dimension)]
+            biased_index = random.randint(0, dimension - 1)
+            vector[biased_index] = min(max_, int(vector[biased_index] * bias__))
+            yield tuple(vector)
 
     return vector_generator(num_iters, dim, max_coord, bias)
 
 
 if __name__ == "__main__":
     # Example usage
-    num_iters = 10
-    dim = 3
-    max_coord = 50
-    bias = 4.5
-    iterator = generate_nonnegative_vectors(num_iters, dim, max_coord, bias)
+    num = 10
+    dim_ = 3
+    max_coord_ = 50
+    bias_ = 4.5
+    iterator = generate_nonnegative_vectors(num, dim_, max_coord_, bias_)
 
-    for vector in iterator:
-        print(vector)
+    for v in iterator:
+        print(v)

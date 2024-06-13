@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from numpy import linspace
 
-from lower_bound.generate_list import generate_list
+from lower_bound.generate_tuple import generate_tuple
 from lower_bound.multinomial_max_cdf_inverse import multinomial_max_cdf_inverse
 
 
@@ -17,7 +17,7 @@ def get_quantile(alpha: float, q: float, n: int, m: int) -> float:
     Returns:
     float: The lower bound of the maximum observed frequency.
     """
-    p = generate_list(m=m, q=q)
+    p = generate_tuple(m=m, q=q)
     quantile = multinomial_max_cdf_inverse(prob=1 - alpha, n=n, p=p)
     return quantile
 

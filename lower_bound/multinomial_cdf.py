@@ -1,10 +1,10 @@
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 from scipy.stats import multinomial
 
 
-def multinomial_cdf(x: List[int], p: List[float]) -> float:
+def multinomial_cdf(x: List[int], p: Tuple[float, ...]) -> float:
     """
     Compute the cumulative distribution function of the multinomial distribution.
 
@@ -33,7 +33,7 @@ def multinomial_cdf(x: List[int], p: List[float]) -> float:
 if __name__ == "__main__":
     # Example usage
     k = [1, 1, 0]  # observed frequencies
-    proba = [0.2, 0.5, 0.3]  # probabilities of the different outcomes
+    proba = (0.2, 0.5, 0.3)  # probabilities of the different outcomes
 
     cdf_value = multinomial_cdf(k, proba)
     print(f"CDF value: {cdf_value}")

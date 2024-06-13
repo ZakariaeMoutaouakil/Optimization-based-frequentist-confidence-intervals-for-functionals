@@ -1,5 +1,5 @@
 from time import time
-from typing import List, Callable
+from typing import Tuple, Callable
 
 from statsmodels.stats.proportion import proportion_confint
 
@@ -9,13 +9,13 @@ from lower_bound.generate_sorted_tuples import generate_sorted_tuples
 from lower_bound.get_quantile import get_quantile
 
 
-def final_result(alpha: float, x: List[int]) -> float:
+def final_result(alpha: float, x: Tuple[int, ...]) -> float:
     """
     Calculate the final result.
 
     Parameters:
     alpha (float): The significance level.
-    x (List[int]): The list of observed frequencies.
+    x (Tuple[int, ...]): The tuple of observed frequencies.
 
     Returns:
     float: The final result.
@@ -28,7 +28,7 @@ def final_result(alpha: float, x: List[int]) -> float:
 
 if __name__ == "__main__":
     # Example usage
-    x_ = [10, 3, 0]
+    x_ = (10, 3, 0)
     alpha_ = 0.01
     print("Maximum observed frequency :", max(x_) / sum(x_))
     start_time = time()  # Start time
@@ -58,7 +58,7 @@ if __name__ == "__main__":
         print("x_                         :", x_)
         print("Maximum observed frequency :", max(x_) / sum(x_))
         start_time = time()  # Start time
-        result = final_result(alpha=alpha_, x=list(x_))
+        result = final_result(alpha=alpha_, x=x_)
         print("My lower bound             :", result)
         end_time = time()  # End time
         p1_ = proportion_confint(max(x_), sum(x_), alpha=2 * alpha_, method="beta")[0]

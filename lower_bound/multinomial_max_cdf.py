@@ -1,12 +1,13 @@
-from typing import List
+from time import time
+from typing import Tuple
 
-import numpy as np
+from numpy import ndindex, array, sum, isclose
 from scipy.stats import multinomial
 
 from lower_bound.multinomial_cdf import multinomial_cdf
 
 
-def multinomial_max_cdf(x: int, n: int, p: List[float]) -> float:
+def multinomial_max_cdf(x: int, n: int, p: Tuple[float, ...]) -> float:
     """
     Compute the cumulative distribution function of the maximum of the multinomial counts.
 
@@ -18,15 +19,15 @@ def multinomial_max_cdf(x: int, n: int, p: List[float]) -> float:
     Returns:
     float: The CDF value for the given parameters.
     """
-    p = np.array(p)
-    assert np.isclose(np.sum(p), 1), "Probabilities must sum to 1"
+    p = array(p)
+    assert isclose(sum(p), 1), "Probabilities must sum to 1"
 
     # Initialize the CDF value
-    cdf = 0.0
+    cdf = 0.
 
     # Iterate over all possible combinations of counts such that the maximum count is <= k_max
-    for comb in np.ndindex(*(x + 1 for _ in range(len(p)))):
-        if np.sum(comb) == n and max(comb) <= x:
+    for comb in ndindex(*(x + 1 for _ in range(len(p)))):
+        if sum(comb) == n and max(comb) <= x:
             cdf += multinomial.pmf(comb, n, p)
 
     return cdf
@@ -36,9 +37,12 @@ if __name__ == "__main__":
     # Example usage
     k_max = 2  # maximum count to consider
     n_ = 6  # number of trials
-    proba = [0.2, 0.5, 0.3]  # probabilities of the different outcomes
+    proba = (0.2, 0.5, 0.3)  # probabilities of the different outcomes
 
+    start_time = time()
     max_cdf_value = multinomial_max_cdf(k_max, n_, proba)
+    end_time = time()
     x_ = [k_max] * len(proba)
     assert max_cdf_value == multinomial_cdf(x_, proba), "CDF values do not match"
     print(f"CDF value of the maximum count: {max_cdf_value}")
+    print(f"Time taken: {end_time - start_time:.6f} seconds")

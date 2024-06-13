@@ -1,9 +1,9 @@
-from typing import List
+from typing import Tuple
 
 from lower_bound.multinomial_max_cdf import multinomial_max_cdf
 
 
-def multinomial_max_cdf_inverse(prob: float, n: int, p: List[float]) -> int:
+def multinomial_max_cdf_inverse(prob: float, n: int, p: Tuple[float, ...]) -> int:
     """
     Compute the inverse cumulative distribution function (quantile function) of the maximum of the multinomial counts.
 
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     # Example usage and assertions
     proba = 0.95  # probability threshold
     n_ = 4  # number of trials
-    p_ = [0.2, 0.5, 0.3]  # probabilities of the different outcomes
+    p_ = (0.2, 0.5, 0.3)  # probabilities of the different outcomes
 
     k_max_value = multinomial_max_cdf_inverse(proba, n_, p_)
     print(f"Inverse CDF value (quantile) for probability {proba}: {k_max_value}")
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     # Additional test cases
     proba_test = 0.5
     n_test = 5
-    p_test = [0.1, 0.2, 0.3, 0.4]
+    p_test = (0.1, 0.2, 0.3, 0.4)
 
     k_max_test_value = multinomial_max_cdf_inverse(proba_test, n_test, p_test)
     print(f"Inverse CDF value (quantile) for probability {proba_test}: {k_max_test_value}")
