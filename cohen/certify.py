@@ -25,8 +25,8 @@ args = parser.parse_args()
 
 if __name__ == "__main__":
     # load the base classifier
-    # checkpoint = torch.load(args.base_classifier, map_location=torch.device('cuda'))
-    checkpoint = torch.load(args.base_classifier, map_location=torch.device('cpu'))
+    checkpoint = torch.load(args.base_classifier, map_location=torch.device('cuda'))
+    # checkpoint = torch.load(args.base_classifier, map_location=torch.device('cpu'))
     base_classifier = get_architecture(checkpoint["arch"], args.dataset)
     base_classifier.load_state_dict(checkpoint['state_dict'])
 
@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
         before_time = time()
         # certify the prediction of g around x
-        x = x  # .cuda()
+        x = x.cuda()
         prediction, radius, counts_estimation, cAHat = smoothed_classifier.certify(x, args.N0, args.N, args.alpha,
                                                                                    args.batch)
         after_time = time()

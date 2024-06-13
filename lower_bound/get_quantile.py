@@ -1,11 +1,12 @@
 import matplotlib.pyplot as plt
 from numpy import linspace
+from tqdm import tqdm
 
 from lower_bound.generate_tuple import generate_tuple
 from lower_bound.multinomial_max_cdf_inverse import multinomial_max_cdf_inverse
 
 
-def get_quantile(alpha: float, q: float, n: int, m: int) -> float:
+def get_quantile(alpha: float, q: float, n: int, m: int) -> int:
     """
     Calculate the lower bound of the maximum observed frequency.
 
@@ -34,7 +35,7 @@ if __name__ == "__main__":
 
     # Plotting the lower bound for different values of q
     q_values = linspace(0.21, 0.99, 10)
-    lower_bounds = [get_quantile(alpha_, q, n_, m_) for q in q_values]
+    lower_bounds = [get_quantile(alpha_, q, n_, m_) for q in tqdm(q_values, desc="Calculating lower bounds")]
 
     plt.plot(q_values, lower_bounds, label=f'n={n_}')
     plt.xlabel('Expected Probability (q)')
