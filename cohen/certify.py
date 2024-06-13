@@ -56,7 +56,7 @@ if __name__ == "__main__":
                                                                                    args.batch)
         after_time = time()
         correct = int(prediction == label)
-
+        counts_estimation = '[' + ', '.join(map(str, counts_estimation)) + ']'
         time_elapsed = str(datetime.timedelta(seconds=(after_time - before_time)))
         print("{}\t{}\t{}\t{:.3}\t{}\t{}\t{}\t{}".format(
             i, label, prediction, radius, correct, time_elapsed, counts_estimation, cAHat), file=f, flush=True)
