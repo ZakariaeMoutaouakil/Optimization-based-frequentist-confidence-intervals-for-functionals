@@ -57,8 +57,8 @@ def plot_multiple_files(file_paths, labels, save_path=None):
 
 # Example usage with multiple files
 file_paths = [
-    '/home/pc/Projects/optimisation/certify/preprocessed_data.tsv',
-    '/home/pc/Projects/optimisation/certify/modified_data.tsv'
+    '/home/pc/Projects/optimisation/preprocessed_data.tsv',
+    '/home/pc/Projects/optimisation/output.tsv'
 ]
 
 labels = ['Cohen', 'Me']  # Generating labels for each file

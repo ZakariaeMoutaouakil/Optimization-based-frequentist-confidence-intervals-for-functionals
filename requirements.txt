@@ -1,5 +1,6 @@
 adce==1.3.3.2
 clarabel==0.8.1
+colorama==0.4.6
 contourpy==1.2.1
 cvxopt==1.3.2
 cvxpy==1.5.1
