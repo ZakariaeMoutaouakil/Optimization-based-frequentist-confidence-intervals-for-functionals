@@ -17,9 +17,9 @@ from utils.discrete_simplex import discrete_simplex
 from utils.logging_config import setup_logger
 
 parser = ArgumentParser(description='Certify many examples')
-parser.add_argument("--data", type=str, help="Location of tsv data")
-parser.add_argument("--outfile", type=str, help="Location of output tsv file")
-parser.add_argument("--log", type=str, help="Location of log file")
+parser.add_argument("--data", type=str, help="Location of tsv data", required=True)
+parser.add_argument("--outfile", type=str, help="Location of output tsv file", required=True)
+parser.add_argument("--log", type=str, help="Location of log file", required=True)
 parser.add_argument("--k", type=int, default=3, help="Number of coordinates")
 parser.add_argument("--step", type=float, default=0.1, help="Step size")
 parser.add_argument("--precision", type=float, default=0.01, help="Precision")
