@@ -1,6 +1,20 @@
+from argparse import ArgumentParser
+
 import matplotlib.pyplot as plt  # Importing matplotlib library for plotting
 import numpy as np  # Importing numpy library for numerical operations
 import pandas as pd  # Importing pandas library for data manipulation
+
+from utils.logging_config import setup_logger
+
+parser = ArgumentParser(description='Certify many examples')
+parser.add_argument("--files", type=str, nargs='+', help="List of tsv files", required=True)
+parser.add_argument("--labels", type=str, nargs='+', help="List of labels", required=True)
+parser.add_argument("--log", type=str, help="Location of log file", required=True)
+parser.add_argument("--plot", type=str, help="Save path of plot")
+args = parser.parse_args()
+
+logger = setup_logger("plot", args.log)
+logger.info(args)
 
 
 def process_file(file_path):
@@ -56,11 +70,4 @@ def plot_multiple_files(file_paths, labels, save_path=None):
 
 
 # Example usage with multiple files
-file_paths = [
-    '/home/pc/Projects/optimisation/preprocessed_data.tsv',
-    '/home/pc/Projects/optimisation/output.tsv'
-]
-
-labels = ['Cohen', 'Me']  # Generating labels for each file
-
-plot_multiple_files(file_paths, labels)  # Calling the function to plot the certified accuracy curves
+plot_multiple_files(args.files, args.labels, args.plot)  # Calling the function to plot the certified accuracy curves
