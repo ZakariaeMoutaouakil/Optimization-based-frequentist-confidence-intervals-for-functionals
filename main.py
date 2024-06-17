@@ -15,13 +15,14 @@ from lower_bound.get_quantiles import get_quantiles
 from lower_bound.max_first_coordinate import max_first_coordinate
 from utils.discrete_simplex import discrete_simplex
 from utils.logging_config import setup_logger
+from utils.remove_zeros import remove_zeros
 
 parser = ArgumentParser(description='Certify many examples')
 parser.add_argument("--data", type=str, help="Location of tsv data", required=True)
 parser.add_argument("--outfile", type=str, help="Location of output tsv file", required=True)
 parser.add_argument("--log", type=str, help="Location of log file", required=True)
 parser.add_argument("--k", type=int, default=3, help="Number of coordinates")
-parser.add_argument("--step", type=float, default=0.1, help="Step size")
+parser.add_argument("--step", type=float, default=0.01, help="Step size")
 parser.add_argument("--precision", type=float, default=0.01, help="Precision")
 parser.add_argument("--alpha", type=float, default=0.001, help="Failure probability")
 parser.add_argument("--grid", type=int, default=101, help="Grid size")
@@ -64,8 +65,9 @@ for i in range(len(df)):
     logger.info(df.iloc[i])
     counts: List[int] = df.iloc[i]['counts']
     prediction = counts.index(max(counts))
-    logger.debug("counts: " + str(counts))
-    observation = sorted(smallest_subset(vector=sorted(counts), num_partitions=args.k))
+    reduced_counts = remove_zeros(coords=tuple(counts), min_dimension=args.k)
+    logger.debug("reduced_counts: " + str(reduced_counts))
+    observation = sorted(smallest_subset(vector=reduced_counts, num_partitions=args.k))
     reduced_counts_tuple = tuple(int(x) for x in observation)
     logger.debug("reduced_counts_tuple: " + str(reduced_counts_tuple))
     radius = 0.
@@ -89,7 +91,7 @@ for i in range(len(df)):
             logger.error(e)
         end_time = time()
         elapsed_time = end_time - start_time
-        logger.info("elapsed_time:" + str(elapsed_time))
+        logger.info("elapsed_time: " + str(elapsed_time))
         if p2 < p1:
             radius = 0.5 * args.sigma * (norm.ppf(p1) - norm.ppf(p2))
         else:
@@ -98,8 +100,8 @@ for i in range(len(df)):
         # Cache the result and time
         final_result_cache[reduced_counts_tuple] = (radius, elapsed_time)
 
-    logger.debug("radius:" + str(radius))
-    logger.debug("prediction:" + str(prediction))
+    logger.debug("radius: " + str(radius))
+    logger.debug("prediction: " + str(prediction))
     df.loc[df.index[i], 'radius'] = radius
     df.loc[df.index[i], 'correct'] = int(prediction == df.iloc[i]['label'])
     df.loc[df.index[i], 'predict'] = prediction

@@ -2,7 +2,7 @@ from typing import Tuple
 
 from tqdm import tqdm
 
-from lower_bound.get_quantile import get_quantile
+from higher_bound.get_quantile import get_quantile
 from lower_bound.subdivide_interval import subdivide_interval
 
 
