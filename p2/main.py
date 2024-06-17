@@ -22,13 +22,15 @@ multinomial_coefficients = multinomial_coefficient(vectors=sample_space_, factor
 alpha = 0.05
 step = 0.1
 print("p1:", max(x) / n)
-indices = generate_multiple_indices(maximum=n, dimension=m)
+indices = generate_multiple_indices(maximum=n, dimension=m, n=n)
 solutions = solve_quadratic(m=m)
 print(solutions)
 lower_quantiles = get_quantiles_lower_bound(alpha=alpha, n=n, m=m, step=step, indices=indices)
+# a = 0.3666666666666667
 a = max_first_coordinate(quantiles=lower_quantiles, maximum=max(x))
 print("Lower bound:", a)
 higher_quantiles = get_quantiles_higher_bound(alpha=a, n=n, m=m, step=step, indices=indices)
+# b = 0.6666666666666666
 b = max_first_coordinate(quantiles=higher_quantiles, maximum=max(x))
 print("Higher bound:", b)
 assert is_interval_included((a, b), solutions), "The interval is not included between the solutions"

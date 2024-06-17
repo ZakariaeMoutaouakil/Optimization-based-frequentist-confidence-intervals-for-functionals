@@ -9,7 +9,7 @@ from lower_bound.generate_tuple import generate_tuple
 from lower_bound.multinomial_max_cdf_inverse import multinomial_max_cdf_inverse
 
 
-def get_quantile(alpha: float, q: float, n: int, m: int, indices: Tuple[Tuple[Tuple[int, ...]], ...]) -> int:
+def get_quantile(alpha: float, q: float, n: int, m: int, indices: Tuple[Tuple[Tuple[int, ...], ...], ...]) -> int:
     """
     Calculate the lower bound of the maximum observed frequency.
 
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     q_ = 0.21  # expected probability for the first category
     n_ = 10  # total number of trials
     m_ = 5  # number of elements in the list
-    indices_ = generate_multiple_indices(maximum=n_, dimension=m_)
+    indices_ = generate_multiple_indices(maximum=n_, dimension=m_, n=n_)
 
     lower_bound = get_quantile(alpha_, q_, n_, m_, indices_)
     print(f"Lower Bound: {lower_bound}")

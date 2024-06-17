@@ -11,7 +11,7 @@ def get_quantiles(alpha: float,
                   n: int,
                   m: int,
                   step: float,
-                  indices: Tuple[Tuple[Tuple[int, ...]], ...]) -> Tuple[Tuple[float, int], ...]:
+                  indices: Tuple[Tuple[Tuple[int, ...], ...], ...]) -> Tuple[Tuple[float, int], ...]:
     """
     Calculate the lower bound of the maximum observed frequency.
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     n_ = 10  # total number of trials
     m_ = 6  # number of elements in the list
     step_ = 0.1  # step size for subdivision
-    indices_ = generate_multiple_indices(maximum=n_, dimension=m_)
+    indices_ = generate_multiple_indices(maximum=n_, dimension=m_, n=n_)
 
     quants = get_quantiles(alpha=alpha_, n=n_, m=m_, step=step_, indices=indices_)
     print(quants)

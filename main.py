@@ -1,19 +1,14 @@
 from argparse import ArgumentParser
 from ast import literal_eval
 from time import time
-from typing import List, Tuple, Dict, Callable
+from typing import List, Tuple, Dict
 
 import pandas as pd
-from cvxpy import Variable
 from scipy.stats import norm
 
 from certify.smallest_subset import smallest_subset
-from distribution.final_step import final_step
-from distribution.generate_quantiles import generate_quantiles
-from distribution.sort_callable_values import second_largest
 from lower_bound.get_quantiles import get_quantiles
 from lower_bound.max_first_coordinate import max_first_coordinate
-from utils.discrete_simplex import discrete_simplex
 from utils.logging_config import setup_logger
 from utils.remove_zeros import remove_zeros
 
@@ -48,12 +43,6 @@ df = pd.read_csv(args.data, sep='\t', dtype=dtype_dict, converters={'counts': li
 n = sum(df.iloc[0]['counts'])
 logger.info("n: " + str(n))
 
-constraint_set: Tuple[Tuple[float, ...], ...] = discrete_simplex(k=args.k, n=args.grid, normalize=True)
-
-phi: Callable[[Variable], float] = lambda p: p[1]
-filter_func: Callable[[float], bool] = lambda x: x > 0
-quantiles_p2 = generate_quantiles(constraint_set=constraint_set, filter_value=filter_func, func=second_largest, n=n,
-                                  phi=phi, alpha=args.alpha, precision=args.precision, debug=False)
 quantiles_p1 = get_quantiles(alpha=args.alpha, n=n, m=args.k, step=args.step)
 
 # Dictionary to cache results and time of final_result function
@@ -81,12 +70,7 @@ for i in range(len(df)):
         logger.debug("p1: " + str(p1))
         logger.debug("p2: " + str(p2))
         try:
-            p2_ = final_step(constraint_set=constraint_set, quantiles=quantiles_p2, observation=reduced_counts_tuple,
-                             func=second_largest, minimize=False, debug=False)
-            logger.debug("p2_: " + str(p2_))
-            if p2_ < p2:
-                logger.warning("p2 < p2_, the GP algorithm made a worse prediction")
-            p2 = min(p2, p2_)
+            1
         except Exception as e:
             logger.error(e)
         end_time = time()
