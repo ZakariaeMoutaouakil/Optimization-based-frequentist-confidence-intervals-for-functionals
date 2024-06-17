@@ -47,7 +47,8 @@ for c in subdivide_interval(start=a, end=b, step=step, include_bounds=False):
         if reject_test(
                 q=q_, x=x, sample_space=sample_space_, multinomial_coefficients=multinomial_coefficients, alpha=alpha
         ):
-            values.append(c)
+            print("Reject")
+            values.append(q)
 
 print(values)
 print("Final result: ", max(values))
