@@ -20,7 +20,7 @@ sample_space_ = sample_space(k=m, n=n)
 factorials = factorial_list(n=n)
 multinomial_coefficients = multinomial_coefficient(vectors=sample_space_, factorials=factorials)
 alpha = 0.05
-step = 0.1
+step = 0.01
 print("p1:", max(x) / n)
 indices = generate_multiple_indices(maximum=n, dimension=m, n=n)
 solutions = solve_quadratic(m=m)
@@ -50,5 +50,5 @@ for c in subdivide_interval(start=a, end=b, step=step, include_bounds=False):
             print("Reject")
             values.append(q)
 
-print(values)
+print(sorted(values, reverse=True))
 print("Final result: ", max(values))
