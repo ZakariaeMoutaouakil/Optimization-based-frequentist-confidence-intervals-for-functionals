@@ -1,11 +1,14 @@
+from typing import Tuple
+
 import matplotlib.pyplot as plt
 from numpy import linspace
 
 from higher_bound.generate_tuple import generate_tuple
+from lower_bound.generate_multiple_indices import generate_multiple_indices
 from lower_bound.multinomial_max_cdf_inverse import multinomial_max_cdf_inverse
 
 
-def get_quantile(alpha: float, q: float, n: int, m: int) -> int:
+def get_quantile(alpha: float, q: float, n: int, m: int, indices: Tuple[Tuple[Tuple[int, ...]], ...]) -> int:
     """
     Calculate the lower bound of the maximum observed frequency.
 
@@ -18,7 +21,7 @@ def get_quantile(alpha: float, q: float, n: int, m: int) -> int:
     float: The lower bound of the maximum observed frequency.
     """
     p = generate_tuple(m=m, q=q)
-    quantile = multinomial_max_cdf_inverse(prob=alpha, n=n, p=p)
+    quantile = multinomial_max_cdf_inverse(prob=alpha, n=n, p=p, indices=indices)
     return quantile
 
 
@@ -28,13 +31,14 @@ if __name__ == "__main__":
     q_ = 0.2  # expected probability for the first category
     n_ = 10  # total number of trials
     m_ = 5  # number of elements in the list
+    indices_ = generate_multiple_indices(maximum=n_, dimension=m_)
 
-    lower_bound = get_quantile(alpha_, q_, n_, m_)
+    lower_bound = get_quantile(alpha_, q_, n_, m_, indices_)
     print(f"Lower Bound: {lower_bound}")
 
     # Plotting the lower bound for different values of q
     q_values = linspace(0.01, 0.99, 100)
-    lower_bounds = [get_quantile(alpha_, q, n_, m_) for q in q_values]
+    lower_bounds = [get_quantile(alpha_, q, n_, m_, indices_) for q in q_values]
 
     plt.plot(q_values, lower_bounds, label=f'n={n_}')
     plt.xlabel('Expected Probability (q)')
