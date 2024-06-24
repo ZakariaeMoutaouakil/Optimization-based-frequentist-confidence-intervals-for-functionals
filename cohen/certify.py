@@ -8,6 +8,7 @@ import torch
 from architectures import get_architecture
 from core import Smooth
 from datasets import get_dataset, DATASETS, get_num_classes
+from utils.logging_config import setup_logger
 
 parser = argparse.ArgumentParser(description='Certify many examples')
 parser.add_argument("--dataset", choices=DATASETS, help="which dataset")
@@ -21,7 +22,11 @@ parser.add_argument("--split", choices=["train", "test"], default="test", help="
 parser.add_argument("--N0", type=int, default=100)
 parser.add_argument("--N", type=int, default=100000, help="number of samples to use")
 parser.add_argument("--alpha", type=float, default=0.001, help="failure probability")
+parser.add_argument("--log", type=str, help="Location of log file")
 args = parser.parse_args()
+
+logger = setup_logger("cohen certification", args.log)
+logger.info(args)
 
 if __name__ == "__main__":
     # load the base classifier
@@ -30,7 +35,7 @@ if __name__ == "__main__":
     base_classifier = get_architecture(checkpoint["arch"], args.dataset)
     base_classifier.load_state_dict(checkpoint['state_dict'])
 
-    # create the smooothed classifier g
+    # create the smoothed classifier g
     smoothed_classifier = Smooth(base_classifier, get_num_classes(args.dataset), args.sigma)
 
     # prepare output file

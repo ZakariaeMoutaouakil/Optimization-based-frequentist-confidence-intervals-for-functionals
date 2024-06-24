@@ -7,7 +7,9 @@ import pandas as pd
 from scipy.stats import norm
 
 from certify.smallest_subset import smallest_subset
-from lower_bound.get_quantiles import get_quantiles
+from higher_bound.get_quantiles import get_quantiles as get_quantiles_p2
+from lower_bound.generate_multiple_indices import generate_multiple_indices
+from lower_bound.get_quantiles import get_quantiles as get_quantiles_p1
 from lower_bound.max_first_coordinate import max_first_coordinate
 from utils.logging_config import setup_logger
 from utils.remove_zeros import remove_zeros
@@ -20,6 +22,7 @@ parser.add_argument("--k", type=int, default=3, help="Number of coordinates")
 parser.add_argument("--step", type=float, default=0.01, help="Step size")
 parser.add_argument("--precision", type=float, default=0.01, help="Precision")
 parser.add_argument("--alpha", type=float, default=0.001, help="Failure probability")
+parser.add_argument("--beta", type=float, default=0.9, help="Ratio of failure probability")
 parser.add_argument("--grid", type=int, default=101, help="Grid size")
 parser.add_argument("--sigma", type=float, default=0.12, help="Noise parameter")
 args = parser.parse_args()
@@ -42,8 +45,24 @@ df = pd.read_csv(args.data, sep='\t', dtype=dtype_dict, converters={'counts': li
 
 n = sum(df.iloc[0]['counts'])
 logger.info("n: " + str(n))
+indices_p1 = generate_multiple_indices(maximum=n, dimension=args.k, n=n)
+logger.debug("indices_p1: " + str(indices_p1))
+beta = args.beta * args.alpha
+logger.info("beta: " + str(beta))
+quantiles_p1 = get_quantiles_p1(alpha=beta, n=n, m=args.k, step=args.step, indices=indices_p1)
+logger.debug("quantiles_p1: " + str(quantiles_p1))
+gamma = (1 - args.beta) * args.alpha / (1 - args.beta * args.alpha)
+logger.info("gamma: " + str(gamma))
 
-quantiles_p1 = get_quantiles(alpha=args.alpha, n=n, m=args.k, step=args.step)
+S = max(set(sum(sorted(df.iloc[i]['counts'])[:-1]) for i in range(len(df))))
+logger.debug("S: " + str(S))
+quantiles_p2 = {}
+for s in range(S + 1):
+    indices_p2 = generate_multiple_indices(maximum=s, dimension=args.k - 1, n=s)
+    logger.debug("indices_p2: " + str(indices_p2))
+    quantiles_p2_s = get_quantiles_p2(alpha=gamma, n=s, m=args.k - 1, step=args.step, indices=indices_p2)
+    logger.debug(f"quantiles_p2_{s}: " + str(quantiles_p2_s))
+    quantiles_p2[s] = quantiles_p2_s
 
 # Dictionary to cache results and time of final_result function
 final_result_cache: Dict[Tuple[int, ...], Tuple[Tuple[float, float], float]] = {}
@@ -66,18 +85,20 @@ for i in range(len(df)):
     else:
         start_time = time()
         p1 = max_first_coordinate(quantiles=quantiles_p1, maximum=max(reduced_counts_tuple))
-        p2 = 1 - p1
+        y = reduced_counts_tuple[:- 1]
+        logger.debug("y: " + str(y))
+        q = max_first_coordinate(quantiles=quantiles_p2[max(y)], maximum=max(y))
+        p2 = q * (1 - p1)
         logger.debug("p1: " + str(p1))
+        logger.debug("q : " + str(q))
         logger.debug("p2: " + str(p2))
-        try:
-            1
-        except Exception as e:
-            logger.error(e)
+        logger.debug("1-p1: " + str(1 - p1))
         end_time = time()
         elapsed_time = end_time - start_time
         logger.info("elapsed_time: " + str(elapsed_time))
         if p2 < p1:
             radius = 0.5 * args.sigma * (norm.ppf(p1) - norm.ppf(p2))
+            logger.debug("Certify this example")
         else:
             prediction = -1
             logger.warning("Don't certify this example")
