@@ -1,8 +1,9 @@
 from argparse import ArgumentParser
+from json import dumps
 
 import matplotlib.pyplot as plt  # Importing matplotlib library for plotting
 import numpy as np  # Importing numpy library for numerical operations
-import pandas as pd  # Importing pandas library for data manipulation
+from pandas import read_csv
 
 from utils.logging_config import setup_logger
 
@@ -14,13 +15,19 @@ parser.add_argument("--plot", type=str, help="Save path of plot")
 args = parser.parse_args()
 
 logger = setup_logger("plot", args.log)
-logger.info(args)
+args_dict = vars(args)
+
+# Pretty print the dictionary with json.dumps
+formatted_args = dumps(args_dict, indent=4)
+
+# Log the formatted arguments
+logger.info(formatted_args)
 
 
 def process_file(file_path):
     """Load and process the dataset to calculate certified accuracy for various radii."""
     # Load the dataset
-    df = pd.read_csv(file_path, delimiter='\t')  # Reading the dataset from the specified file path
+    df = read_csv(file_path, delimiter='\t')  # Reading the dataset from the specified file path
 
     # Filter rows where the prediction is correct
     df_correct = df[df['correct'] == 1]  # Filtering the dataframe to include only correct predictions

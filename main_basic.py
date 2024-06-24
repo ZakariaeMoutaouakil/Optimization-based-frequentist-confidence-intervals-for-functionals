@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 from ast import literal_eval
-from pprint import pformat
+from json import dumps
 from time import time
 from typing import List, Tuple, Dict
 
@@ -28,7 +28,13 @@ logger = setup_logger("certification", args.log)
 
 # Use pprint to log the arguments in a more readable format
 logger.info("Parsed arguments:")
-logger.info(pformat(vars(args), indent=4))
+args_dict = vars(args)
+
+# Pretty print the dictionary with json.dumps
+formatted_args = dumps(args_dict, indent=4)
+
+# Log the formatted arguments
+logger.info(formatted_args)
 
 # Define the data types for each column
 dtype_dict = {

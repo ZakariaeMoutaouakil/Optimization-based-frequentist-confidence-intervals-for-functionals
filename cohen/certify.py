@@ -1,6 +1,7 @@
 # evaluate a smoothed classifier on a dataset
 import argparse
 import datetime
+from json import dumps
 from time import time
 
 import torch
@@ -26,7 +27,13 @@ parser.add_argument("--log", type=str, help="Location of log file")
 args = parser.parse_args()
 
 logger = setup_logger("cohen certification", args.log)
-logger.info(args)
+args_dict = vars(args)
+
+# Pretty print the dictionary with json.dumps
+formatted_args = dumps(args_dict, indent=4)
+
+# Log the formatted arguments
+logger.info(formatted_args)
 
 if __name__ == "__main__":
     # load the base classifier

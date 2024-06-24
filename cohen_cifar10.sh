@@ -22,8 +22,7 @@ do
     --base_classifier \"$base_classifier_path\" \
     --sigma \"$sigma_str\" \
     --batch 400 \
-    --N0 10 \
-    --N 100 \
+    --N 10000 \
     --outfile \"$outfile_path\" \
     --log \"$log_path\""
 
