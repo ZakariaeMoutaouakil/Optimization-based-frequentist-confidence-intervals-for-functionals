@@ -10,6 +10,10 @@ do
     outfile_path="$HOME/output/cifar10/noise_$sigma_str/certification_output.tsv"
     log_path="$HOME/output/cifar10/noise_$sigma_str/log.log"
 
+    # Create necessary directories
+    mkdir -p "$(dirname "$outfile_path")"
+    mkdir -p "$(dirname "$log_path")"
+
     command="python cohen/certify.py --dataset cifar10 \
     --base_classifier \"$base_classifier_path\" \
     --sigma \"$sigma_str\" \
