@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Set locale to ensure decimal point handling
+export LC_NUMERIC="C"
+
 for sigma in 0.12 0.25 0.50 1.00
 do
     sigma_str=$(printf "%.2f" "$sigma")
