@@ -17,6 +17,7 @@ do
     command="python cohen/certify.py --dataset cifar10 \
     --base_classifier \"$base_classifier_path\" \
     --sigma \"$sigma_str\" \
+    --batch 400 \
     --outfile \"$outfile_path\" \
     --log \"$log_path\""
 
