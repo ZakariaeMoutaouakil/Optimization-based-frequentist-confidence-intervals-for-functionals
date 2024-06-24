@@ -67,4 +67,3 @@ if __name__ == "__main__":
             i, label, prediction, radius, correct, time_elapsed, counts_estimation, cAHat), file=f, flush=True)
 
     f.close()
-# python cohen/certify.py --dataset cifar10 --base_classifier models/cifar10/resnet110/noise_0.12/checkpoint.pth.tar --outfile certification_output.tsv --sigma 0.12 --max 100 --N0 70 --N 100
