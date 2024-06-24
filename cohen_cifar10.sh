@@ -2,6 +2,7 @@
 
 # Set locale to ensure decimal point handling
 export LC_NUMERIC="C"
+export PYTHONPATH="$HOME/Optimization-based-frequentist-confidence-intervals-for-functionals"
 
 for sigma in 0.12 0.25 0.50 1.00
 do
@@ -18,6 +19,8 @@ do
     --base_classifier \"$base_classifier_path\" \
     --sigma \"$sigma_str\" \
     --batch 400 \
+    --N0 10 \
+    --N 100 \
     --outfile \"$outfile_path\" \
     --log \"$log_path\""
 
