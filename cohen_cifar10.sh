@@ -30,3 +30,6 @@ do
     echo "$command"
     eval "$command"
 done
+
+# Deactivate the virtual environment
+deactivate

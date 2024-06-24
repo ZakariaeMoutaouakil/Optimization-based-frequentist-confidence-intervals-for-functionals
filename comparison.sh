@@ -33,3 +33,6 @@ do
         eval "$command"
     done
 done
+
+# Deactivate the virtual environment
+deactivate
