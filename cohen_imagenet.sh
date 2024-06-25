@@ -8,7 +8,7 @@ export LC_NUMERIC="C"
 export PYTHONPATH="$HOME/Optimization-based-frequentist-confidence-intervals-for-functionals"
 export IMAGENET_DIR="$HOME/imagenet"
 
-for sigma in 0.12 0.25 0.50 1.00
+for sigma in 0.25 0.50 1.00
 do
     sigma_str=$(printf "%.2f" "$sigma")
     base_classifier_path="$HOME/models/imagenet/resnet50/noise_$sigma_str/checkpoint.pth.tar"
