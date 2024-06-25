@@ -58,7 +58,7 @@ quantiles_p1 = get_quantiles(alpha=args.alpha, n=n, m=args.k, step=args.step, in
 logger.debug("quantiles_p1: " + str(quantiles_p1))
 
 # Dictionary to cache results and time of final_result function
-final_result_cache: Dict[Tuple[int, ...], Tuple[Tuple[float, float], float]] = {}
+final_result_cache: Dict[Tuple[int, ...], Tuple[float, float]] = {}
 elapsed_time, cached_time = 0., 0.
 
 for i in range(len(df)):

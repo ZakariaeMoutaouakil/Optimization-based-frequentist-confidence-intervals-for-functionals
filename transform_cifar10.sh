@@ -28,6 +28,7 @@ do
             # Run the transformation command
             command="python main_basic.py --data \"$infile_path\" \
             --outfile \"$outfile_path\" \
+            --sigma \"$sigma_str\" \
             --log \"$log_path\""
 
             echo "$command"

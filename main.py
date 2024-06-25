@@ -67,7 +67,7 @@ for s in range(S + 1):
     quantiles_p2[s] = quantiles_p2_s
 
 # Dictionary to cache results and time of final_result function
-final_result_cache: Dict[Tuple[int, ...], Tuple[Tuple[float, float], float]] = {}
+final_result_cache: Dict[Tuple[int, ...], Tuple[float, float]] = {}
 elapsed_time, cached_time = 0., 0.
 
 for i in range(len(df)):
