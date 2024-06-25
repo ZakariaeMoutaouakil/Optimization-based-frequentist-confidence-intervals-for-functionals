@@ -6,6 +6,7 @@ source "$HOME/Optimization-based-frequentist-confidence-intervals-for-functional
 # Set locale to ensure decimal point handling
 export LC_NUMERIC="C"
 export PYTHONPATH="$HOME/Optimization-based-frequentist-confidence-intervals-for-functionals"
+export IMAGENET_DIR="$HOME/imagenet"
 
 for sigma in 0.12 0.25 0.50 1.00
 do
