@@ -1,3 +1,4 @@
+from scipy.stats import beta
 from statsmodels.stats.proportion import proportion_confint
 
 from lower_bound.generate_multiple_indices import generate_multiple_indices
@@ -17,6 +18,8 @@ p1 = max_first_coordinate(quantiles=quantiles, maximum=max(x))
 print("My p1:", p1)
 p1_ = proportion_confint(max(x), n, alpha=2 * alpha, method="beta")[0]
 print("statsmodels p1:", p1_)
+p1__ = beta.ppf(alpha, max(x) , n - max(x) + 1)
+print("scipy p1:", p1__)
 
 alpha = 0.01
 quantiles = get_quantiles(alpha=alpha, n=n, m=m, step=step, indices=indices)
@@ -25,3 +28,5 @@ p1 = max_first_coordinate(quantiles=quantiles, maximum=max(x))
 print("My p1:", p1)
 p1_ = proportion_confint(max(x), n, alpha=2 * alpha, method="beta")[0]
 print("statsmodels p1:", p1_)
+p1__ = beta.ppf(alpha, max(x) , n - max(x) + 1)
+print("scipy p1:", p1__)

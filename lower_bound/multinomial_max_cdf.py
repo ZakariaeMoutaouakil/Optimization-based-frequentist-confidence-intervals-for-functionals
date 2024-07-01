@@ -23,14 +23,20 @@ def multinomial_max_cdf(x: int, n: int, p: Tuple[float, ...], indices: Tuple[Tup
     """
     p = array(p)
     assert isclose(sum(p), 1), "Probabilities must sum to 1"
+    # assert n > 0, "Number of trials must be positive"
 
     # Initialize the CDF value
     cdf = 0.
-
-    # Iterate over all possible combinations of counts such that the maximum count is <= k_max
-    for comb in indices[x]:
-        # print(comb)
-        cdf += multinomial.pmf(comb, n, p)
+    if x >= n:
+        return 1.
+    elif x <= 0:
+        return 0.
+    else:
+        # Iterate over all possible combinations of counts such that the maximum count is <= k_max
+        for comb in indices[x]:
+            # print(comb)
+            cdf += multinomial.pmf(comb, n, p)
+            # print(cdf, comb, n, p)
 
     return cdf
 
