@@ -17,7 +17,6 @@ parser.add_argument("--base_classifier", type=str, help="path to saved pytorch m
 parser.add_argument("--sigma", type=float, help="noise hyperparameter")
 parser.add_argument("--outfile", type=str, help="output file")
 parser.add_argument("--batch", type=int, default=1000, help="batch size")
-parser.add_argument("--skip", type=int, default=1, help="how many examples to skip")
 parser.add_argument("--max", type=int, default=-1, help="stop after this many examples")
 parser.add_argument("--split", choices=["train", "test"], default="test", help="train or test set")
 parser.add_argument("--N0", type=int, default=100)
@@ -52,10 +51,6 @@ if __name__ == "__main__":
     # iterate through the dataset
     dataset = get_dataset(args.dataset, args.split)
     for i in range(len(dataset)):
-
-        # only certify every args.skip examples, and stop after args.max examples
-        if i % args.skip != 0:
-            continue
         if i == args.max:
             break
 

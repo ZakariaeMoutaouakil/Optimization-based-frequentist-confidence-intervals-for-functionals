@@ -7,7 +7,8 @@ from lower_bound.max_first_coordinate import max_first_coordinate
 
 alpha = 0.05
 step = 0.01
-x = (1, 5, 30)
+# x = (1, 5, 20)
+x = (0,10)
 n = sum(x)
 m = len(x)
 indices = generate_multiple_indices(maximum=n, dimension=m, n=n)
@@ -18,7 +19,9 @@ p1 = max_first_coordinate(quantiles=quantiles, maximum=max(x))
 print("My p1:", p1)
 p1_ = proportion_confint(max(x), n, alpha=2 * alpha, method="beta")[0]
 print("statsmodels p1:", p1_)
-p1__ = beta.ppf(alpha, max(x) , n - max(x) + 1)
+p1_ = proportion_confint(n - max(x), n, alpha=2 * alpha, method="beta")[0]
+print("statsmodels p1:", p1_)
+p1__ = beta.ppf(alpha, max(x), n - max(x) + 1)
 print("scipy p1:", p1__)
 
 alpha = 0.01
@@ -28,5 +31,7 @@ p1 = max_first_coordinate(quantiles=quantiles, maximum=max(x))
 print("My p1:", p1)
 p1_ = proportion_confint(max(x), n, alpha=2 * alpha, method="beta")[0]
 print("statsmodels p1:", p1_)
-p1__ = beta.ppf(alpha, max(x) , n - max(x) + 1)
+p1_ = proportion_confint(n - max(x), n, alpha=2 * alpha, method="beta")[0]
+print("statsmodels p1:", p1_)
+p1__ = beta.ppf(alpha, max(x), n - max(x) + 1)
 print("scipy p1:", p1__)
